@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from routers import cameras, incidents, drones, monitoring, stream
+from routers import cameras, incidents, drones, monitoring, stream, webhook
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +26,7 @@ app.include_router(incidents.router)
 app.include_router(drones.router)
 app.include_router(monitoring.router)
 app.include_router(stream.router)
+app.include_router(webhook.router)
 
 
 @app.exception_handler(Exception)
