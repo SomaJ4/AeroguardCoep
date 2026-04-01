@@ -1,0 +1,4 @@
+# file: D:\Sirvelllence\aeroguard\backend\routers\drones.py
+# hypothesis_version: 6.151.9
+
+[60.0, 404, 409, '*', '/dispatch', '/drones', '/{drone_id}/status', 'Drone not found', 'drone_id', 'drones', 'id', 'incident_id', 'incidents', 'lat', 'lat, lng', 'lat, lng, speed_kmh', 'lng', 'speed_kmh', 'status']

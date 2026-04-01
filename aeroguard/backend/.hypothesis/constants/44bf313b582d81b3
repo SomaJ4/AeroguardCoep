@@ -1,0 +1,4 @@
+# file: D:\Sirvelllence\aeroguard\backend\services\simulation.py
+# hypothesis_version: 6.151.9
+
+[0.05, 60.0, 3600, 'arrived_at', 'available', 'created_at', 'dispatch_logs', 'drone_id', 'drones', 'id', 'incident_id', 'lat', 'lat, lng', 'lng', 'now()', 'on_scene', 'status']

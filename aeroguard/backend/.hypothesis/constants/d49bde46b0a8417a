@@ -1,0 +1,4 @@
+# file: D:\Sirvelllence\aeroguard\backend\db\supabase.py
+# hypothesis_version: 6.151.9
+
+['SUPABASE_SERVICE_KEY', 'SUPABASE_URL', 'http://localhost', 'placeholder']

@@ -1,0 +1,4 @@
+# file: D:\Sirvelllence\aeroguard\backend\routers\stream.py
+# hypothesis_version: 6.151.9
+
+[404, 503, 8192, '/camera/{camera_id}', '/stream', '/{drone_id}', 'Camera not found', 'Drone not found', 'GET', 'Stream unavailable', 'cameras', 'drones', 'id', 'stream', 'stream_url']
