@@ -63,10 +63,10 @@ async def simulate_drone_to_incident(
             if dist <= 0.05:
                 supabase.table("drones").update({"status": "on_scene"}).eq("id", drone_id).execute()
 
-                # Write arrived_at to the most recent dispatch_log for this drone+incident
+                # Write arrived_at to the dispatch_log for this drone+incident
                 supabase.table("dispatch_logs").update({"arrived_at": "now()"}).eq(
                     "drone_id", drone_id
-                ).eq("incident_id", incident_id).order("created_at", desc=True).limit(1).execute()
+                ).eq("incident_id", incident_id).execute()
 
                 break
         except Exception:

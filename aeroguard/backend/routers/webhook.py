@@ -42,9 +42,16 @@ async def incident_inserted(request: Request):
 
     logger.info("Webhook: incident %s classified as %s", incident_id, risk_level)
 
-    # Auto-dispatch for high risk
     if risk_level == "high":
         asyncio.create_task(dispatch_drone(incident_id))
         logger.info("Webhook: auto-dispatch triggered for incident %s", incident_id)
+    elif risk_level == "medium":
+        # Push alert so dashboard can show manual dispatch prompt
+        supabase.table("alerts").insert({
+            "incident_id": incident_id,
+            "risk_level": "medium",
+            "message": f"Medium-risk incident detected. Manual drone dispatch required.",
+        }).execute()
+        logger.info("Webhook: medium-risk alert created for incident %s", incident_id)
 
     return {"status": "processed", "incident_id": incident_id, "risk_level": risk_level}

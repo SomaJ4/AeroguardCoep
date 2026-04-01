@@ -26,31 +26,30 @@ async def create_incident(body: IncidentCreate, background_tasks: BackgroundTask
 
 
 @router.patch("/{incident_id}/status", response_model=IncidentOut)
-async def update_incident_status(incident_id: str, body: StatusUpdate, background_tasks: BackgroundTasks):
+async def update_incident_status(incident_id: str, body: StatusUpdate):
     existing = supabase.table("incidents").select("*").eq("id", incident_id).execute()
     if not existing.data:
         raise HTTPException(status_code=404, detail="Incident not found")
     resp = supabase.table("incidents").update({"status": body.status}).eq("id", incident_id).execute()
     incident = resp.data[0]
     if body.status == "resolved":
-        # Find the active dispatch log for this incident and trigger drone return
         log_resp = (
             supabase.table("dispatch_logs")
-            .select("drone_id, drones(home_lat, home_lng, speed_kmh)")
+            .select("drone_id")
             .eq("incident_id", incident_id)
-            .order("dispatched_at", desc=True)
-            .limit(1)
             .execute()
         )
         if log_resp.data:
-            log = log_resp.data[0]
-            drone = log.get("drones") or {}
+            # Take the most recent log
+            drone_id = log_resp.data[-1]["drone_id"]
+            drone_resp = supabase.table("drones").select("home_lat, home_lng, speed_kmh").eq("id", drone_id).single().execute()
+            drone = drone_resp.data or {}
             from services.simulation import simulate_drone_return
-            background_tasks.add_task(
-                simulate_drone_return,
-                log["drone_id"],
+            import asyncio
+            asyncio.create_task(simulate_drone_return(
+                drone_id,
                 drone.get("home_lat", 0),
                 drone.get("home_lng", 0),
                 drone.get("speed_kmh", 60.0),
-            )
+            ))
     return incident
