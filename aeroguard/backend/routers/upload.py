@@ -4,7 +4,7 @@ from db.supabase import supabase
 
 router = APIRouter(prefix="/upload", tags=["upload"])
 
-BUCKET = "videos"
+BUCKET = "Videos"
 
 
 @router.post("/video")
