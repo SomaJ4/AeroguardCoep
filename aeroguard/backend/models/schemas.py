@@ -107,3 +107,31 @@ class MonitoringSessionOut(BaseModel):
 # Shared
 class StatusUpdate(BaseModel):
     status: str
+
+
+# Vision Service integration models
+
+class AnalyzeResult(BaseModel):
+    """Result returned by the Vision Service POST /analyze endpoint."""
+    id: str
+    camera_id: str
+    incident_type: Literal["fire", "theft", "accident", "intrusion", "patrol", "animal"]
+    risk_score: float = Field(ge=0.0, le=1.0)
+    confidence: float = Field(ge=0.0, le=1.0)
+    lat: float
+    lng: float
+    snapshot_url: Optional[str] = None
+
+
+class BatchResultItem(BaseModel):
+    """Per-video outcome in a batch analysis response."""
+    camera_id: str
+    url: str  # Supabase public URL
+    status: Literal["success", "failed"]
+    result: Optional[AnalyzeResult] = None  # present when status == "success"
+    error: Optional[str] = None             # present when status == "failed"
+
+
+class BatchResult(BaseModel):
+    """Aggregated response for POST /upload/videos."""
+    items: list[BatchResultItem]
