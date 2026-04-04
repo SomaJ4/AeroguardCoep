@@ -6,6 +6,8 @@ from fastapi.responses import JSONResponse
 from db.supabase import supabase
 from models.schemas import AnalyzeResult, BatchResult, BatchResultItem
 from services import vision_client
+from services.risk import classify_risk
+from services.dispatch import dispatch_drone
 
 router = APIRouter(prefix="/upload", tags=["upload"])
 
@@ -155,6 +157,42 @@ async def upload_videos(
                 error=str(outcome),
             ))
         else:
+            # Save incident to Supabase and trigger dispatch if needed
+            try:
+                risk_level = classify_risk(float(outcome.risk_score))
+                incident_data = {
+                    "id": outcome.id,
+                    "camera_id": outcome.camera_id,
+                    "incident_type": outcome.incident_type,
+                    "risk_score": outcome.risk_score,
+                    "confidence": outcome.confidence,
+                    "risk_level": risk_level,
+                    "lat": outcome.lat,
+                    "lng": outcome.lng,
+                    "snapshot_url": outcome.snapshot_url,
+                    "status": "open",
+                }
+                supabase.table("incidents").upsert(incident_data).execute()
+
+                if risk_level == "high":
+                    async def _dispatch_and_log(incident_id: str):
+                        import logging as _log
+                        try:
+                            result = await dispatch_drone(incident_id)
+                            _log.getLogger(__name__).info("Dispatch success: %s", result)
+                        except Exception as _e:
+                            _log.getLogger(__name__).error("Dispatch failed for %s: %s", incident_id, _e)
+                    asyncio.create_task(_dispatch_and_log(outcome.id))
+                elif risk_level == "medium":
+                    supabase.table("alerts").insert({
+                        "incident_id": outcome.id,
+                        "risk_level": "medium",
+                        "message": "Medium-risk incident detected. Manual drone dispatch required.",
+                    }).execute()
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error("Post-analyze processing failed: %s", e)
+
             items.append(BatchResultItem(
                 camera_id=camera_ids[i],
                 url=public_urls[i],

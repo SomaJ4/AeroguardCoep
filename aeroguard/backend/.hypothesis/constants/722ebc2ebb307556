@@ -1,0 +1,4 @@
+# file: D:\Sirvelllence\aeroguard\backend\services\dispatch.py
+# hypothesis_version: 6.151.9
+
+[0.01, 60.0, 100, 3600, '*', 'available', 'battery_pct', 'dispatch_log_id', 'dispatch_logs', 'drone_id', 'drones', 'en_route', 'eta_seconds', 'id', 'incident_id', 'incidents', 'lat', 'lat, lng', 'lng', 'route_geojson', 'speed_kmh', 'status']

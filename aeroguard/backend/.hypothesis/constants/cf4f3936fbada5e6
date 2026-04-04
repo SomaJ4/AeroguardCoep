@@ -1,0 +1,4 @@
+# file: D:\Sirvelllence\aeroguard\backend\services\vision_client.py
+# hypothesis_version: 6.151.9
+
+[200, 400, 424, 503, '1.0', '3', '30.0', 'AnalyzeResult', 'VISION_SERVICE_URL', 'camera_id', 'session_id', 'stream_url']

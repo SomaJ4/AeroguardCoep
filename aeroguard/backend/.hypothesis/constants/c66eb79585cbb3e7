@@ -1,0 +1,4 @@
+# file: D:\Sirvelllence\aeroguard\backend\routers\webhook.py
+# hypothesis_version: 6.151.9
+
+[400, '/incident-inserted', '/webhook', 'INSERT', 'alerts', 'high', 'id', 'ignored', 'incident_id', 'incidents', 'medium', 'message', 'not an INSERT event', 'processed', 'reason', 'record', 'risk_level', 'risk_score', 'skipped', 'status', 'type', 'webhook']

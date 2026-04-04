@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AeroGuard Command Center | Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#141c26",
+                        "outline": "#8f9195",
+                        "on-surface": "#e0e2ea",
+                        "surface-container-high": "#262a30",
+                        "surface-dim": "#101419",
+                        "surface-tint": "#ffb785",
+                        "on-primary-fixed-variant": "#723700",
+                        "on-tertiary-container": "#e43b39",
+                        "surface-container": "#1c2025",
+                        "outline-variant": "#45474b",
+                        "secondary-fixed-dim": "#bfc7d5",
+                        "tertiary-fixed-dim": "#ffb3ac",
+                        "secondary-container": "#424a55",
+                        "surface": "#101419",
+                        "on-surface-variant": "#c5c6cb",
+                        "on-secondary-fixed-variant": "#3f4752",
+                        "on-primary-fixed": "#301400",
+                        "surface-container-lowest": "#0a0e13",
+                        "surface-variant": "#31353b",
+                        "inverse-primary": "#954a00",
+                        "primary": "#ffb785",
+                        "tertiary": "#ffb3ac",
+                        "tertiary-fixed": "#ffdad6",
+                        "on-primary-container": "#be6310",
+                        "secondary-fixed": "#dbe3f1",
+                        "primary-fixed-dim": "#ffb785",
+                        "on-background": "#e0e2ea",
+                        "surface-container-low": "#181c21",
+                        "on-tertiary": "#680008",
+                        "on-secondary": "#29313b",
+                        "surface-container-highest": "#31353b",
+                        "background": "#101419",
+                        "tertiary-container": "#280001",
+                        "on-secondary-container": "#b1b9c6",
+                        "inverse-surface": "#e0e2ea",
+                        "on-primary": "#502400",
+                        "on-error": "#690005",
+                        "inverse-on-surface": "#2d3136",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#930010",
+                        "primary-container": "#1d0900",
+                        "error": "#ffb4ab",
+                        "on-error-container": "#ffdad6",
+                        "secondary": "#bfc7d5",
+                        "on-tertiary-fixed": "#410003",
+                        "surface-bright": "#36393f",
+                        "primary-fixed": "#ffdcc6",
+                        "tactical-orange": "#B85E09"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(16, 20, 25, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(143, 145, 149, 0.1);
+        }
+        .status-pulse {
+            box-shadow: 0 0 0 0 rgba(184, 94, 9, 0.7);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(184, 94, 9, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(184, 94, 9, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(184, 94, 9, 0); }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body overflow-hidden">
+<!-- Unified Full-Screen Background -->
+<div class="fixed inset-0 z-0">
+<img alt="Cinematic night view of a futuristic smart city with glowing grids and drone patrol paths" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/ADBb0uh9WGGXQQFgc8aWN9wyu045p64ztZuROxOBRONg-ibgb6E9IwKUYwCOeluoxn9ahdR3BZufGmb0IBQEEae3Y22fl6j6LMrIBRwzaRaoB0oUlalfnrp9I6kQNF7BELWwEq-uGABuCNQF-cTlqsmdcNV1VYdZSXpGC8ee2TuLleg0iyKqV0ZkmWD99E5BJ4pc0omnPM4RRr8DZVPpW3RpTAMIrKtMLppT158Iv1Bq2LwmY-x4D3GkMEmxgmom-oAW1AV3lt7jFKJIIw"/>
+<!-- Dark Tactical Overlays matching IMAGE_2 tones -->
+<div class="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-background/60"></div>
+<div class="absolute inset-0 bg-black/20"></div>
+<!-- Visual Decorative Grid -->
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at 2px 2px, #8f9195 1px, transparent 0); background-size: 40px 40px;"></div>
+</div>
+<main class="relative z-10 flex h-screen w-full">
+<!-- Left Content Section (60%) -->
+<section class="hidden md:flex w-3/5 h-full flex-col justify-between p-16">
+<!-- Top Header -->
+<div class="flex items-center space-x-4">
+<div class="w-10 h-10 border-2 border-tactical-orange flex items-center justify-center">
+<span class="material-symbols-outlined text-tactical-orange" style="font-variation-settings: 'FILL' 1;">shield</span>
+</div>
+<span class="font-headline font-bold text-xl tracking-[0.2em] uppercase text-on-surface">AeroGuard</span>
+</div>
+<!-- Center Text -->
+<div class="max-w-xl">
+<h1 class="font-headline text-6xl font-bold leading-tight mb-4 tracking-tight text-white">
+                    AI-Powered <br/>
+<span class="text-tactical-orange">Urban Safety</span>
+</h1>
+<p class="font-headline text-lg tracking-[0.3em] uppercase text-outline">
+                    Detect → Analyze → Respond → Resolve
+                </p>
+</div>
+<!-- UI Indicators / Telemetry Widgets -->
+<div class="grid grid-cols-3 gap-6">
+<div class="glass-panel p-6 flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<span class="font-label text-[0.6875rem] uppercase tracking-widest text-outline">Live Monitoring</span>
+<div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-outline">sensors</span>
+<span class="font-headline text-2xl font-bold">42 <span class="text-sm font-light text-outline">NODES</span></span>
+</div>
+</div>
+<div class="glass-panel p-6 flex flex-col gap-3 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-1 h-full bg-tactical-orange/50"></div>
+<div class="flex items-center justify-between">
+<span class="font-label text-[0.6875rem] uppercase tracking-widest text-outline text-tactical-orange">Incident Detected</span>
+<span class="material-symbols-outlined text-tactical-orange text-xs">warning</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-tactical-orange">location_searching</span>
+<span class="font-headline text-2xl font-bold text-tactical-orange">SEC-7 <span class="text-sm font-light text-outline">ALPHA</span></span>
+</div>
+</div>
+<div class="glass-panel p-6 flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<span class="font-label text-[0.6875rem] uppercase tracking-widest text-outline">Drone Dispatched</span>
+<span class="material-symbols-outlined text-outline text-xs">flight_takeoff</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-outline">precision_manufacturing</span>
+<span class="font-headline text-2xl font-bold">UAV-09 <span class="text-sm font-light text-outline italic">EN ROUTE</span></span>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Login Panel (40%) - Transparent -->
+<section class="w-full md:w-2/5 h-full bg-transparent flex flex-col items-center justify-center p-8 md:p-24 relative">
+<!-- Technical Watermark Background -->
+<div class="absolute top-0 right-0 p-8 opacity-5 select-none pointer-events-none">
+<p class="font-label text-[10rem] font-bold leading-none tracking-tighter">AG</p>
+</div>
+<div class="w-full max-w-sm z-10">
+<!-- Brand Header -->
+<div class="mb-12">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-8 h-8 bg-tactical-orange flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-xl" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<h2 class="font-headline font-bold text-2xl tracking-tighter text-on-surface">AeroGuard</h2>
+</div>
+<h3 class="font-headline text-3xl font-bold text-on-surface mb-2">Welcome Back</h3>
+<p class="font-label text-sm uppercase tracking-widest text-outline">Command Center Access</p>
+</div>
+<!-- Login Form -->
+<form class="space-y-6">
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="font-label text-[0.6875rem] uppercase tracking-[0.15em] text-white block" for="email">Operator Identity</label>
+<div class="relative group">
+<input class="w-full bg-transparent border-b border-white focus:border-tactical-orange focus:ring-0 text-on-surface py-3 px-0 transition-all placeholder:text-surface-container-highest/50 font-body text-sm" id="email" placeholder="email@aeroguard.com" type="email"/>
+<span class="absolute right-0 top-3 material-symbols-outlined text-white/70 group-focus-within:text-tactical-orange transition-colors text-lg">badge</span>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-2">
+<label class="font-label text-[0.6875rem] uppercase tracking-[0.15em] text-white block" for="password">Security Protocol</label>
+<div class="relative group">
+<input class="w-full bg-transparent border-b border-white focus:border-tactical-orange focus:ring-0 text-on-surface py-3 px-0 transition-all placeholder:text-surface-container-highest/50 font-body text-sm" id="password" placeholder="••••••••••••" type="password"/>
+<span class="absolute right-0 top-3 material-symbols-outlined text-white/70 group-focus-within:text-tactical-orange transition-colors text-lg">lock</span>
+</div>
+</div>
+<!-- Action Row -->
+<div class="flex items-center justify-between pt-2">
+<label class="flex items-center gap-2 cursor-pointer group">
+<div class="relative flex items-center">
+<input class="peer appearance-none w-4 h-4 border rounded-none bg-transparent checked:bg-tactical-orange checked:border-tactical-orange transition-all border-white" type="checkbox"/>
+<span class="material-symbols-outlined absolute opacity-0 peer-checked:opacity-100 text-[10px] text-white left-[3px]">check</span>
+</div>
+<span class="font-label text-[0.6875rem] uppercase tracking-widest group-hover:text-on-surface transition-colors text-white">Remember me</span>
+</label>
+<a class="font-label text-[0.6875rem] uppercase tracking-widest hover:text-tactical-orange transition-colors underline decoration-outline-variant/30 underline-offset-4 text-white" href="#">Forgot Password</a>
+</div>
+<!-- Submit Button -->
+<div class="pt-6">
+<button class="w-full bg-tactical-orange hover:bg-[#a65408] text-white font-headline font-bold uppercase tracking-[0.2em] py-5 flex items-center justify-center gap-3 transition-all active:scale-[0.98] group" type="submit">
+<span>Initialize Access</span>
+<span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</form>
+<!-- Footer Meta -->
+<div class="mt-16 flex flex-col gap-4">
+<div class="h-[1px] w-12 bg-outline-variant/30"></div>
+<p class="font-label text-[0.6rem] leading-relaxed uppercase tracking-widest text-outline/50 max-w-[200px]">
+                        Authorized personnel only. All access attempts are logged and monitored by AeroGuard AI.
+                    </p>
+</div>
+</div>
+<!-- Bottom System Status Bar -->
+<div class="absolute bottom-0 left-0 w-full p-6 flex justify-between items-center bg-black/20 backdrop-blur-sm">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="font-label text-[0.6rem] uppercase tracking-widest text-outline/40">Status:</span>
+<span class="font-label text-[0.6rem] uppercase tracking-widest text-emerald-500">Secure</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label text-[0.6rem] uppercase tracking-widest text-outline/40">Lat:</span>
+<span class="font-label text-[0.6rem] uppercase tracking-widest text-on-surface">52.5200° N</span>
+</div>
+</div>
+<div class="font-label text-[0.6rem] uppercase tracking-widest text-outline/40">
+                    v4.8.2-tactical
+                </div>
+</div>
+</section>
+</main>
+</body></html>

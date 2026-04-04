@@ -1,0 +1,4 @@
+# file: D:\Sirvelllence\aeroguard\backend\routers\alerts.py
+# hypothesis_version: 6.151.9
+
+[404, '*', '/alerts', '/all', 'Alert not found', 'acknowledged', 'alerts', 'id']

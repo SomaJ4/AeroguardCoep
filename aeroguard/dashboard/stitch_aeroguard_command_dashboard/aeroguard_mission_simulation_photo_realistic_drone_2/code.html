@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AEROGUARD | SOVEREIGN COMMAND</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&amp;family=Inter:wght@300;400;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+        .scanline {
+            background: linear-gradient(to bottom, rgba(255, 182, 140, 0) 50%, rgba(255, 182, 140, 0.05) 50%);
+            background-size: 100% 4px;
+        }
+        .map-grid {
+            background-image: 
+                linear-gradient(to right, rgba(85, 67, 57, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(85, 67, 57, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .data-bracket-tl { border-top: 1px solid #ffb68c; border-left: 1px solid #ffb68c; width: 8px; height: 8px; position: absolute; top: 0; left: 0; }
+        .data-bracket-tr { border-top: 1px solid #ffb68c; border-right: 1px solid #ffb68c; width: 8px; height: 8px; position: absolute; top: 0; right: 0; }
+        .data-bracket-bl { border-bottom: 1px solid #ffb68c; border-left: 1px solid #ffb68c; width: 8px; height: 8px; position: absolute; bottom: 0; left: 0; }
+        .data-bracket-br { border-bottom: 1px solid #ffb68c; border-right: 1px solid #ffb68c; width: 8px; height: 8px; position: absolute; bottom: 0; right: 0; }
+        
+        @keyframes dash {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        .path-animate {
+            stroke-dasharray: 10, 5;
+            stroke-dashoffset: 150;
+            animation: dash 5s linear infinite;
+        }
+        .drone-glow {
+            filter: drop-shadow(0 0 12px rgba(184, 95, 38, 0.8));
+        }
+
+        @keyframes moveAlongPath {
+            0% { offset-distance: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { offset-distance: 100%; opacity: 0; }
+        }
+        .drone-follower {
+            offset-path: path("M 300 400 Q 500 100 700 250");
+            animation: moveAlongPath 8s linear infinite;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ffb68c",
+                        "primary-container": "#da7635",
+                        "surface": "#131314",
+                        "surface-container": "#201f20",
+                        "surface-container-low": "#1c1b1c",
+                        "surface-container-lowest": "#0e0e0f",
+                        "surface-container-high": "#2a2a2b",
+                        "on-surface-variant": "#dcc1b4",
+                        "outline-variant": "#554339",
+                        "drone-tactical": "#B85F26"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body overflow-hidden h-screen select-none">
+<!-- TopNavBar: Shared Component -->
+<header class="bg-[#131314] flex justify-between items-center w-full px-6 py-4 border-b border-[#554339]/30 fixed top-0 z-50">
+<div class="flex items-center gap-8">
+<span class="text-xl font-light tracking-[0.2em] text-[#ffb68c] font-headline">AEROGUARD</span>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="font-['Space_Grotesk'] uppercase tracking-[0.15em] font-light text-[#ffb68c] border-b-2 border-[#ffb68c] pb-1" href="#">OPERATIONS</a>
+<a class="font-['Space_Grotesk'] uppercase tracking-[0.15em] font-light text-[#dcc1b4] hover:text-[#ffb68c] transition-colors duration-200" href="#">INTELLIGENCE</a>
+<a class="font-['Space_Grotesk'] uppercase tracking-[0.15em] font-light text-[#dcc1b4] hover:text-[#ffb68c] transition-colors duration-200" href="#">ANALYTICS</a>
+<a class="font-['Space_Grotesk'] uppercase tracking-[0.15em] font-light text-[#dcc1b4] hover:text-[#ffb68c] transition-colors duration-200" href="#">ARCHIVE</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex flex-col items-end">
+<span class="text-[10px] font-mono text-primary tracking-widest flex items-center gap-2">
+<span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                    SYSTEM ACTIVE
+                </span>
+<span class="text-[12px] font-mono text-on-surface-variant">14:20:05 UTC</span>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer">settings</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer">notifications</span>
+<div class="w-8 h-8 bg-surface-container-highest border border-outline-variant/30 overflow-hidden">
+<img alt="Command Officer Avatar" class="w-full h-full object-cover grayscale opacity-80" data-alt="Professional command officer avatar, male, cinematic lighting, sharp detail, neutral expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8HaXMfzgrWQtA3fjosjCDEBYsj2iYW040YU_B_lGFKd1_zzzimEB6Tsg34HfyQH9jOPNpArhR-R_T-2RIn5pL5bxVklBY-kuSmGslA5O6Jh3PlEZzmHL2f6m6HYdzO3bSRWy7OJt90-9JhVeweJ34_WVKHfFbbLZeSPoL_FcHna3n7XJpk1GHFMs8GK94OR84XZj2XvKGO2WNPE2D7kyCghZqXcuP1AnhgYmZFGHfF5AKhBRGPQO99nPlhGulHRY1UYHhSeerfAcH"/>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar: Shared Component -->
+<aside class="fixed left-0 top-0 h-full flex flex-col items-center py-8 z-40 bg-[#0e0e0f] border-r border-[#1A1A1C] w-20 pt-24">
+<div class="flex flex-col gap-8 flex-grow">
+<!-- Tactical Map (Active) -->
+<button class="flex flex-col items-center gap-2 text-[#ffb68c] border-l-2 border-[#ffb68c] bg-[#da7635]/10 w-full py-4 group">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">target</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-widest text-[10px]">TACTICAL</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-[#dcc1b4]/50 hover:bg-[#201f20] hover:text-[#ffb68c] w-full py-4 transition-all">
+<span class="material-symbols-outlined">radar</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-widest text-[10px]">SENSORS</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-[#dcc1b4]/50 hover:bg-[#201f20] hover:text-[#ffb68c] w-full py-4 transition-all">
+<span class="material-symbols-outlined">settings_input_antenna</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-widest text-[10px]">COMMS</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-[#dcc1b4]/50 hover:bg-[#201f20] hover:text-[#ffb68c] w-full py-4 transition-all">
+<span class="material-symbols-outlined">precision_manufacturing</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-widest text-[10px]">DRONES</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-[#dcc1b4]/50 hover:bg-[#201f20] hover:text-[#ffb68c] w-full py-4 transition-all">
+<span class="material-symbols-outlined">public</span>
+<span class="font-['Space_Grotesk'] uppercase tracking-widest text-[10px]">ORBITAL</span>
+</button>
+</div>
+<div class="mt-auto flex flex-col items-center gap-6 pb-4">
+<span class="material-symbols-outlined text-[#dcc1b4]/50 hover:text-primary cursor-pointer">lock</span>
+<span class="material-symbols-outlined text-[#dcc1b4]/50 hover:text-primary cursor-pointer">power_settings_new</span>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="pl-20 pt-16 h-full relative overflow-hidden bg-surface-container-lowest">
+<!-- Tactical Map Background -->
+<div class="absolute inset-0 z-0 map-grid opacity-30"></div>
+<div class="absolute inset-0 z-0 opacity-40">
+<img class="w-full h-full object-cover grayscale mix-blend-overlay" data-alt="Dark moody cinematic aerial satellite view of a futuristic city grid at night with faint orange and blue lights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGpwwUNNZPx_zbSw39rKiTYUWJrmG5YwPALGwyGKe9_pHy4c8N13DoI0XgG3CqryaXxeEZO5pMD6FsCscD9je0hjHlJGAeg7FQes3XqKVWosA-mrxd3AeFlFcu_JkYTgFUMlaJQIINPlaLb4UP5Jqx_4MoaOZGaiXodjwnU8dCjmwazDSh1s9f0a5CGIQX5oqhqF391MhgCzswDFKAKFoRj2ZCN5t6pIKI1GhDhEN3OwJq_UIDU6KI6vwSFWaiuIeLO_YosuMYgP_K"/>
+</div>
+<!-- UI Overlays -->
+<div class="relative z-10 p-8 h-full flex flex-col justify-between pointer-events-none">
+<!-- Top Row HUD -->
+<div class="flex justify-between items-start">
+<!-- Unit Identity Card -->
+<div class="w-72 bg-surface-container/90 backdrop-blur-xl p-4 border border-outline-variant/50 relative pointer-events-auto shadow-2xl">
+<div class="data-bracket-tl"></div><div class="data-bracket-tr"></div><div class="data-bracket-bl"></div><div class="data-bracket-br"></div>
+<div class="flex justify-between items-start mb-4">
+<div>
+<h2 class="font-headline text-lg tracking-widest text-primary">AG-VECTOR-09</h2>
+<p class="text-[10px] text-on-surface-variant font-mono uppercase tracking-tighter">IDENTIFIED_NEURAL_UNIT</p>
+</div>
+<div class="w-12 h-12 flex items-center justify-center">
+<img alt="Drone Icon" class="w-full h-full object-contain filter hue-rotate-[15deg] saturate-[1.5] drop-shadow-[0_0_5px_rgba(184,95,38,0.6)]" src="https://lh3.googleusercontent.com/aida/ADBb0uhE3zT-ARa-mIg1AaGzTWgiMr8dsbwWTd0Tvb0ScxsIxcPn10-ElMABYY2S-MkDyan5CDNDSeSDTYYU5XVB2JA24F26a-R_tw6bAiC8IJ83OuH-TVFwKdCmh_THCb2cb_09ausYCdb0v_TH-V1eP2-KEI8XXlct5kkvTHsJe6m8Veo1jSxxUDWvCsxYv_0fANfbgWxvQdXCJl6uK455CqLoo_MylGkaKDRlmSSRTHFxxWG8mTv01nofIgy0HWUeNjWftSvsx2KFrg"/>
+</div>
+</div>
+<div class="space-y-4">
+<div class="space-y-1">
+<div class="flex justify-between text-[10px] font-mono text-on-surface-variant">
+<span>ENERGY CELL</span>
+<span class="text-primary font-bold">88%</span>
+</div>
+<div class="h-1.5 bg-surface-container-highest w-full overflow-hidden rounded-full">
+<div class="bg-primary h-full w-[88%] shadow-[0_0_10px_#ffb68c]"></div>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-mono text-on-surface-variant">AIR SPEED</span>
+<span class="text-xl font-headline text-primary font-bold">142 <span class="text-[10px] font-normal">KM/H</span></span>
+</div>
+<div class="pt-4 border-t border-outline-variant/30">
+<p class="text-[10px] font-mono text-on-surface-variant mb-1">TIME TO IMPACT</p>
+<p class="text-4xl font-headline font-light text-primary">01:42 <span class="text-sm">SEC</span></p>
+</div>
+</div>
+</div>
+<!-- Simulation & POV Overlay -->
+<div class="flex flex-col items-end gap-4 pointer-events-auto">
+<div class="flex gap-2">
+<div class="bg-drone-tactical text-white px-6 py-2 font-headline text-xs tracking-[0.3em] flex items-center gap-2 border border-white/20 shadow-[0_0_15px_rgba(184,95,38,0.4)]">
+<span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                            SIMULATION ACTIVE
+                        </div>
+<div class="bg-surface-container/90 backdrop-blur-md px-4 py-2 font-headline text-[10px] tracking-[0.2em] text-on-surface-variant border border-outline-variant/50 uppercase">
+                            LAYER: LOGISTICS
+                        </div>
+</div>
+<!-- POV Feed -->
+<div class="w-80 h-48 bg-surface-container-lowest border border-outline-variant/30 relative overflow-hidden group">
+<div class="absolute inset-0 scanline opacity-30 z-20"></div>
+<img class="w-full h-full object-cover grayscale brightness-50" data-alt="First person drone view over urban city architecture with digital scanning HUD elements, crosshairs, and tracking markers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRLOz6D-SS6iaDpr57zm_DeApM5N2qba9BI3gtDPxhKAxqBeuRHqIMw3DP1Zu_KIvj_Mp_Se8URJelLJaeiDyZW-gobuq0uT-Ub96MX6kbIG7T8FmziyWFoCrug45S31yjdlCiQdnEjEHimaZBzaV8VXBs6PlY9O_Rz4mCBapcpX1ZIJqa0RjukRf8-mynGCWLSFMTEpOJua1hEsnSrRi63_khyi0lqnQeeGqNiSs-HDNzpVRBif7mKQNo4JeWS7qpP7UAjonJ0QeQ"/>
+<!-- HUD Elements -->
+<div class="absolute inset-0 p-3 z-30 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="text-[10px] font-mono text-red-500 flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span> [LIVE] POV_DRONE_074
+                                </span>
+<span class="text-[10px] font-mono text-primary">CAM_SEC_8</span>
+</div>
+<!-- Crosshair -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
+<div class="w-10 h-[1px] bg-primary"></div>
+<div class="h-10 w-[1px] bg-primary absolute"></div>
+</div>
+<div class="flex justify-between items-end">
+<div class="font-mono text-[9px] text-primary space-y-0.5">
+<p>ALT: 152.4M</p>
+<p>ZOOM: 2.4X</p>
+</div>
+<div class="font-mono text-[9px] text-primary text-right">
+<p>HDG: 284° NW</p>
+<p>GPS: 34.0522° N</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Center Tactical Interaction -->
+<div class="absolute inset-0 flex items-center justify-center">
+<!-- Enhanced Flight Path -->
+<div class="absolute w-full h-full pointer-events-none">
+<svg class="w-full h-full" viewbox="0 0 1000 600">
+<!-- Base Alpha Point -->
+<circle cx="300" cy="400" fill="#B85F26" r="4"></circle>
+<text class="font-headline text-[10px] tracking-widest font-bold" fill="#B85F26" x="290" y="425">BASE ALPHA [P1]</text>
+<!-- Flight Path Arc -->
+<path class="path-animate opacity-80" d="M 300 400 Q 500 100 700 250" fill="none" id="simPath" stroke="#B85F26" stroke-width="2"></path>
+<path class="opacity-30" d="M 300 400 Q 500 100 700 250" fill="none" stroke="#B85F26" stroke-width="0.5"></path>
+</svg>
+<!-- High-Fidelity Drone Follower -->
+<div class="drone-follower absolute top-0 left-0" style="width: 64px; height: 64px; margin-left: -32px; margin-top: -32px;">
+<img alt="Active Drone Unit" class="w-full h-full object-contain drone-glow filter hue-rotate-[15deg] brightness-125" src="https://lh3.googleusercontent.com/aida/ADBb0uhE3zT-ARa-mIg1AaGzTWgiMr8dsbwWTd0Tvb0ScxsIxcPn10-ElMABYY2S-MkDyan5CDNDSeSDTYYU5XVB2JA24F26a-R_tw6bAiC8IJ83OuH-TVFwKdCmh_THCb2cb_09ausYCdb0v_TH-V1eP2-KEI8XXlct5kkvTHsJe6m8Veo1jSxxUDWvCsxYv_0fANfbgWxvQdXCJl6uK455CqLoo_MylGkaKDRlmSSRTHFxxWG8mTv01nofIgy0HWUeNjWftSvsx2KFrg"/>
+</div>
+</div>
+<div class="flex flex-col items-center gap-12">
+<div class="bg-surface-container-high/65 backdrop-blur-sm p-3 border border-primary/20 pointer-events-auto shadow-xl opacity-80 transform scale-75 -translate-y-32 -translate-x-16">
+<div class="flex items-center gap-4">
+<div class="text-center px-1">
+<p class="text-[8px] font-headline tracking-widest text-primary font-bold mb-0.5">DRONE VECTOR</p>
+<p class="text-xl font-headline text-primary font-bold">02:10 <span class="text-[8px] font-normal">ETA</span></p>
+<p class="text-[8px] font-mono text-on-surface-variant font-bold mt-0.5 tracking-wider">DIRECT ROUTE</p>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant/50"></div>
+<div class="text-center px-1">
+<p class="text-[8px] font-headline tracking-widest text-on-surface-variant font-bold mb-0.5 uppercase">GROUND SUPPORT</p>
+<p class="text-xl font-headline text-on-surface-variant font-bold">09:45 <span class="text-[8px] font-normal">ETA</span></p>
+<p class="text-[8px] font-mono text-on-surface-variant/70 font-bold mt-0.5 tracking-wider uppercase">SURFACE GRID</p>
+</div>
+</div>
+</div>
+<!-- Incident Pin -->
+<div class="flex flex-col items-center gap-2">
+<div class="relative">
+<div class="w-14 h-14 border-2 border-drone-tactical rotate-45 flex items-center justify-center bg-drone-tactical/20 shadow-[0_0_20px_rgba(184,95,38,0.3)]">
+<span class="material-symbols-outlined text-drone-tactical -rotate-45 text-2xl" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div class="absolute -top-1 -right-1 w-4 h-4 bg-red-600 rounded-full border-2 border-surface animate-pulse"></div>
+</div>
+<div class="bg-surface-container-high p-2 border border-drone-tactical text-center min-w-[140px] shadow-lg">
+<p class="font-headline text-[10px] tracking-widest text-drone-tactical font-bold">INCIDENT 402 [P2]</p>
+<p class="text-[9px] font-mono text-on-surface-variant font-bold uppercase">DISTRICT_9A_TARGET</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Row HUD -->
+<div class="flex justify-end items-end w-full">
+<!-- Telemetry Log -->
+<div class="w-80 bg-surface-container-lowest/95 border-l border-t border-outline-variant/50 p-4 font-mono pointer-events-auto backdrop-blur-md">
+<div class="flex items-center justify-between border-b border-outline-variant/30 pb-2 mb-3">
+<span class="text-[10px] text-primary font-headline tracking-[0.2em] font-bold">LIVE TELEMETRY STREAM</span>
+<span class="text-[8px] text-on-surface-variant uppercase font-bold">BUFFER_ACTIVE</span>
+</div>
+<div class="space-y-2 text-[10px] h-32 overflow-y-auto pr-2 custom-scrollbar">
+<p class="flex gap-3"><span class="text-drone-tactical font-bold">14:18:22</span> <span class="text-on-surface-variant">VECTOR-09 LIFT-OFF SUCCESS</span></p>
+<p class="flex gap-3"><span class="text-drone-tactical font-bold">14:18:45</span> <span class="text-on-surface-variant">ASCENDING TO 150M CRUISE ALT</span></p>
+<p class="flex gap-3"><span class="text-drone-tactical font-bold">14:19:10</span> <span class="text-on-surface-variant">THERMAL SCAN: NOMINAL</span></p>
+<p class="flex gap-3"><span class="text-drone-tactical font-bold">14:19:35</span> <span class="text-on-surface-variant font-bold text-primary">INCIDENT_402 TARGET_LOCK_ESTABLISHED</span></p>
+<p class="flex gap-3"><span class="text-drone-tactical font-bold">14:20:01</span> <span class="text-primary animate-pulse font-bold">RECALCULATING OPTIMAL PATH...</span></p>
+<p class="flex gap-3"><span class="text-drone-tactical font-bold">14:20:04</span> <span class="text-primary font-bold">PATH_OPTIMIZED [PRIORITY_ALPHA]</span></p>
+<p class="flex gap-3"><span class="text-drone-tactical font-bold">14:20:05</span> <span class="text-white font-bold">COMMENCING SIMULATED ENGAGEMENT</span></p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Data Strip -->
+<div class="fixed bottom-0 left-20 right-0 h-10 bg-surface-container-lowest border-t border-outline-variant/30 px-6 flex items-center justify-between text-[10px] font-mono z-40">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-primary">encrypted</span>
+<span class="text-on-surface-variant tracking-widest font-bold">ENCRYPTED DATA STREAM</span>
+</div>
+<div class="h-4 w-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-2">
+<span class="text-on-surface-variant font-bold">SIGNAL:</span>
+<span class="text-primary font-bold">98%</span>
+<div class="flex gap-0.5 items-end h-3">
+<div class="w-1 h-1 bg-primary"></div>
+<div class="w-1 h-2 bg-primary"></div>
+<div class="w-1 h-3 bg-primary"></div>
+<div class="w-1 h-4 bg-primary"></div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-6 text-on-surface-variant font-bold">
+<span>COORD: 34.0522° N, 118.2437° W</span>
+<span class="text-primary">LAT_LONG_LOCKED</span>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-primary rounded-full shadow-[0_0_5px_#ffb68c]"></span>
+<span class="uppercase tracking-widest text-[9px] font-headline">Secure Session</span>
+</div>
+</div>
+</div>
+</main>
+</body></html>

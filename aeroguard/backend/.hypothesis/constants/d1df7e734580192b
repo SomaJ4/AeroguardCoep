@@ -1,0 +1,4 @@
+# file: D:\Sirvelllence\aeroguard\backend\routers\upload.py
+# hypothesis_version: 6.151.9
+
+[200, 207, 400, 500, 502, '.', '/upload', '/video', '/videos', 'File must be a video', 'Videos', 'content-type', 'failed', 'filename', 'message', 'mp4', 'success', 'upload', 'url', 'video/']

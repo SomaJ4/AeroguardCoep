@@ -1,0 +1,4 @@
+# file: D:\Sirvelllence\aeroguard\backend\routers\monitoring.py
+# hypothesis_version: 6.151.9
+
+[5.0, 201, 404, '*', '/monitoring', '/sessions', '/start', '/stop', 'Camera not found', 'VISION_SERVICE_URL', 'active', 'camera_id', 'cameras', 'ended_at', 'id', 'lat', 'lng', 'monitoring', 'monitoring_sessions', 'now()', 'session_id', 'started_at', 'status', 'stopped', 'stream_url']

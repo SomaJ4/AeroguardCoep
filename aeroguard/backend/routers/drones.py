@@ -28,3 +28,21 @@ def update_drone_status(drone_id: str, body: StatusUpdate):
         raise HTTPException(status_code=404, detail="Drone not found")
     resp = supabase.table("drones").update({"status": body.status}).eq("id", drone_id).execute()
     return resp.data[0]
+
+
+@router.get("/dispatch/logs")
+def get_dispatch_logs():
+    resp = (
+        supabase.table("dispatch_logs")
+        .select("*")
+        .order("dispatched_at", desc=True)
+        .limit(50)
+        .execute()
+    )
+    return resp.data
+
+
+@router.get("/no-fly-zones")
+def get_no_fly_zones():
+    resp = supabase.table("no_fly_zones").select("*").eq("is_active", True).execute()
+    return resp.data

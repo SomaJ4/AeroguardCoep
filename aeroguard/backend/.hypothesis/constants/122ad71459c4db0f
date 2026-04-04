@@ -1,0 +1,4 @@
+# file: D:\Sirvelllence\aeroguard\backend\main.py
+# hypothesis_version: 6.151.9
+
+[500, '*', '/health', '1.0.0', 'AeroGuard API', 'Unhandled error: %s', 'detail', 'ok', 'status']

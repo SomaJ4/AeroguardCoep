@@ -1,0 +1,4 @@
+# file: D:\Sirvelllence\aeroguard\backend\models\schemas.py
+# hypothesis_version: 6.151.9
+
+[0.0, 1.0, 'accident', 'animal', 'available', 'charging', 'en_route', 'failed', 'fire', 'intrusion', 'on_scene', 'patrol', 'success', 'theft']

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AEROGUARD - MISSION ARCHIVE</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-low": "#1c1b1c",
+                        "secondary-fixed": "#ffdbca",
+                        "secondary-container": "#893c00",
+                        "on-tertiary-fixed-variant": "#004d63",
+                        "on-error-container": "#ffdad6",
+                        "surface-bright": "#3a393a",
+                        "outline": "#a38c80",
+                        "error": "#ffb4ab",
+                        "inverse-primary": "#9a4601",
+                        "secondary": "#ffb68e",
+                        "inverse-surface": "#e5e2e3",
+                        "on-secondary": "#542200",
+                        "on-surface": "#e5e2e3",
+                        "on-primary": "#532200",
+                        "tertiary-container": "#139dc5",
+                        "on-surface-variant": "#dcc1b4",
+                        "tertiary-fixed-dim": "#65d3fe",
+                        "surface-tint": "#ffb68c",
+                        "surface-container": "#201f20",
+                        "on-primary-fixed-variant": "#763400",
+                        "on-background": "#e5e2e3",
+                        "secondary-fixed-dim": "#ffb68e",
+                        "primary": "#ffb68c",
+                        "primary-container": "#da7635",
+                        "tertiary": "#65d3fe",
+                        "surface-variant": "#353436",
+                        "surface-container-lowest": "#0e0e0f",
+                        "on-tertiary-fixed": "#001f29",
+                        "surface-container-high": "#2a2a2b",
+                        "on-secondary-container": "#ffb68d",
+                        "error-container": "#93000a",
+                        "inverse-on-surface": "#313031",
+                        "tertiary-fixed": "#bce9ff",
+                        "background": "#131314",
+                        "primary-fixed": "#ffdbc9",
+                        "surface-container-highest": "#353436",
+                        "on-secondary-fixed": "#331200",
+                        "on-secondary-fixed-variant": "#773300",
+                        "outline-variant": "#554339",
+                        "on-tertiary-container": "#002e3c",
+                        "on-error": "#690005",
+                        "primary-fixed-dim": "#ffb68c",
+                        "on-tertiary": "#003545",
+                        "surface-dim": "#131314",
+                        "surface": "#131314",
+                        "on-primary-fixed": "#321200",
+                        "on-primary-container": "#481d00"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .fine-grid {
+            background-image: radial-gradient(circle, #1A1A1C 1px, transparent 1px);
+            background-size: 16px 16px;
+        }
+        .noise-bg {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='noiseFilter'%3F%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary overflow-hidden h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-6 h-16 bg-[#131314] border-b border-stone-800/30 fixed top-0 z-50">
+<div class="text-xl font-light tracking-[0.2em] text-orange-400 uppercase font-['Space_Grotesk']">
+            AEROGUARD
+        </div>
+<nav class="hidden md:flex gap-12 h-full items-center">
+<a class="font-['Space_Grotesk'] uppercase tracking-[0.15em] font-light text-stone-500 hover:text-orange-300 transition-colors duration-200" href="#">OPERATIONS</a>
+<a class="font-['Space_Grotesk'] uppercase tracking-[0.15em] font-light text-stone-500 hover:text-orange-300 transition-colors duration-200" href="#">INTELLIGENCE</a>
+<a class="font-['Space_Grotesk'] uppercase tracking-[0.15em] font-light text-stone-500 hover:text-orange-300 transition-colors duration-200" href="#">ANALYTICS</a>
+<a class="font-['Space_Grotesk'] uppercase tracking-[0.15em] font-light text-orange-400 border-b-2 border-orange-500 pb-1" href="#">ARCHIVE</a>
+</nav>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-stone-400 cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="material-symbols-outlined text-stone-400 cursor-pointer hover:text-primary transition-colors">settings</span>
+<div class="w-8 h-8 border border-outline-variant p-0.5">
+<img alt="Command Officer Avatar" class="w-full h-full object-cover grayscale" data-alt="Close-up portrait of a serious military command officer with tactical gear in high-contrast cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjA7wwnT82TNIk8iYc36jdEWteke3Z9W0tBoR2fC4t-szL26Pi9Shcj6BVNW1hNOKRS6_pmlwiAkTCGw5UoaUDJ8hANOUy5qf3c_-YWIXiEpDg7TP4_VqaBDNskEIFfltjTskKGu0Jqlc_0DMqUVHi7il8mxhgmWP2mfN1V36LMslDIUAFAMbd6EJ-6x0-Sw3uGGoVa6_Ho_EeCdbSHpGUKGhUnoYVjkJ2URwGfpF2s5m1N0GcH2ZHwRqkhC2MT-isjPqne2mcsDAS"/>
+</div>
+</div>
+</header>
+<!-- Main Layout Container -->
+<div class="flex flex-1 pt-16 overflow-hidden">
+<!-- Left Panel: FILTERS & CATEGORIES -->
+<aside class="w-64 bg-[#0e0e0f] border-r border-stone-900 flex flex-col p-6 gap-8 overflow-y-auto">
+<div class="space-y-1">
+<h2 class="font-headline text-[10px] tracking-widest text-primary uppercase font-bold">FILTERS &amp; CATEGORIES</h2>
+<div class="h-[1px] w-8 bg-primary"></div>
+</div>
+<div class="space-y-6">
+<div class="space-y-3">
+<label class="font-headline text-[10px] tracking-widest text-stone-500 uppercase">Date Range</label>
+<div class="bg-surface-container-lowest border-l-2 border-primary-container p-2">
+<div class="text-[11px] font-mono text-on-surface-variant flex justify-between items-center">
+<span>2023-10-01</span>
+<span class="material-symbols-outlined text-xs">calendar_today</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border-l-2 border-outline-variant p-2 opacity-50">
+<div class="text-[11px] font-mono text-on-surface-variant flex justify-between items-center">
+<span>2023-11-24</span>
+<span class="material-symbols-outlined text-xs">calendar_today</span>
+</div>
+</div>
+</div>
+<div class="space-y-3">
+<label class="font-headline text-[10px] tracking-widest text-stone-500 uppercase">Severity</label>
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-3 group cursor-pointer">
+<div class="w-3 h-3 border border-outline-variant group-hover:border-primary"></div>
+<span class="text-[11px] font-headline tracking-widest text-on-surface-variant uppercase">Critical</span>
+</div>
+<div class="flex items-center gap-3 group cursor-pointer">
+<div class="w-3 h-3 bg-primary"></div>
+<span class="text-[11px] font-headline tracking-widest text-on-surface uppercase">Standard</span>
+</div>
+<div class="flex items-center gap-3 group cursor-pointer">
+<div class="w-3 h-3 border border-outline-variant group-hover:border-primary"></div>
+<span class="text-[11px] font-headline tracking-widest text-on-surface-variant uppercase">Low</span>
+</div>
+</div>
+</div>
+<div class="space-y-3">
+<label class="font-headline text-[10px] tracking-widest text-stone-500 uppercase">Unit Involved</label>
+<div class="space-y-2">
+<div class="text-[11px] p-2 bg-surface-container text-on-surface border border-outline-variant/20 uppercase tracking-wider font-headline">Drone Alpha-9</div>
+<div class="text-[11px] p-2 bg-surface-container text-on-surface border border-outline-variant/20 uppercase tracking-wider font-headline">Scout Echo-4</div>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-6 border-t border-stone-800/50">
+<button class="w-full bg-primary text-on-primary py-3 font-headline text-[11px] tracking-[0.2em] uppercase font-bold hover:opacity-90 transition-opacity">
+                    APPLY FILTERS
+                </button>
+</div>
+</aside>
+<!-- Center Stage: MISSION HISTORY & PLAYBACK -->
+<main class="flex-1 fine-grid flex flex-col relative overflow-hidden">
+<div class="noise-bg absolute inset-0"></div>
+<!-- Top Section: Incident List (Bento-style scroll) -->
+<section class="h-1/3 border-b border-stone-900/50 p-6 space-y-4">
+<div class="flex justify-between items-end">
+<h2 class="font-headline text-[12px] tracking-[0.2em] text-on-surface uppercase font-bold">MISSION HISTORY REPLAY</h2>
+<span class="font-mono text-[10px] text-primary">RECORDS FOUND: 42</span>
+</div>
+<div class="flex gap-4 overflow-x-auto pb-4 custom-scrollbar">
+<!-- Incident Card 1 -->
+<div class="min-w-[280px] bg-surface-container border-l-2 border-primary p-4 space-y-3 cursor-pointer hover:bg-surface-container-high transition-colors relative group">
+<div class="flex justify-between items-start">
+<span class="font-mono text-[14px] text-on-surface font-bold">INC-401</span>
+<span class="text-[10px] font-headline tracking-widest text-primary uppercase">COMPLETED</span>
+</div>
+<div class="w-full h-16 bg-black relative overflow-hidden grayscale group-hover:grayscale-0 transition-all">
+<img class="w-full h-full object-cover opacity-50" data-alt="Aerial thermal satellite map showing urban terrain with blue and red heat signatures for mission tracking" data-location="Berlin" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTpslvPmMJ8gk02Ju5CSsY5olXNB50pd_8JifiWlOE2Te3NI9FAd_fcg2hja29gR5cQKBYfdjtP_w3crlhRQWvKcAIm1dIws_FmoQ1KWRPiN327qZWxSj6873hBZdosRto4knFymjFJpnz5B4GdoWWBBetOSN3SBpbC_i_5VEJ530LxJRpZMpwGyC0c6032prPpH-ZC7AKfbSPumj6mHZnqhXbqje2g0H6Kk5xW0c3CGY68c8s1OXYiSd1HunIq83mJ20X36n0soVs"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-white/50">navigation</span>
+</div>
+</div>
+<div class="flex justify-between font-mono text-[9px] text-on-surface-variant">
+<span>LAT: 52.5200</span>
+<span>LNG: 13.4050</span>
+</div>
+</div>
+<!-- Incident Card 2 -->
+<div class="min-w-[280px] bg-surface-container-low border-l-2 border-stone-700 p-4 space-y-3 cursor-pointer hover:bg-surface-container-high transition-colors relative">
+<div class="flex justify-between items-start">
+<span class="font-mono text-[14px] text-on-surface">INC-398</span>
+<span class="text-[10px] font-headline tracking-widest text-stone-500 uppercase">ARCHIVED</span>
+</div>
+<div class="w-full h-16 bg-black relative overflow-hidden grayscale">
+<img class="w-full h-full object-cover opacity-50" data-alt="Top-down drone perspective of a dark industrial complex with orange high-intensity lighting at night" data-location="Detroit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPOWxNPb5gFDNITzC7mShDUELhUqylfMajia1D6v18L6Bc5b8IA8if3GrYT9nT_qEGfCSz0mbORouxbsA7HyyzroIUQ1P9xIJtaJ16Xxq4lBZdRyzqZCelEf_mS81sfdnStmbQICUesZ80clyLcMCwcmwNUw_iqXC61-4HrMghXv7non7hac41usy2aSiUzcRNalY5T1hzcaPGLvpr6TfoOYY1a7LUdKCn1ohua67SqvbM-jZw8EUD6PKVZ8M0ng5x8rUT7-tbl3qF"/>
+</div>
+<div class="flex justify-between font-mono text-[9px] text-on-surface-variant">
+<span>LAT: 42.3314</span>
+<span>LNG: -83.0458</span>
+</div>
+</div>
+<!-- Incident Card 3 -->
+<div class="min-w-[280px] bg-surface-container-low border-l-2 border-stone-700 p-4 space-y-3 cursor-pointer hover:bg-surface-container-high transition-colors relative">
+<div class="flex justify-between items-start">
+<span class="font-mono text-[14px] text-on-surface">INC-382</span>
+<span class="text-[10px] font-headline tracking-widest text-stone-500 uppercase">ARCHIVED</span>
+</div>
+<div class="w-full h-16 bg-black relative overflow-hidden grayscale">
+<img class="w-full h-full object-cover opacity-50" data-alt="Radar map visual showing scanning waves over a mountain range in dark blue aesthetic" data-location="Tokyo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5JtPXOLfazx-3h4PqRdlHZgD2b3_TTmBh_eTMcZSRuz07OBCivCR3towWo1sB8PQg53RIsQ6jvJ73heisCHLvQ3OIhrBQwdZ7jJ4l7ZHVEKKCcdjq7eUT0X7rKH_Xxb10TaCkuG1VUdqKwojzcdvGgjAiItBUYhr7lq_1j5kEe6IuE1q119pIYOiHHNtcsXWK2G4nF2JlJUx2ndiOj0vM0OSUc_kTOxJ9EbCMz61e5rcl7l85EYoONoTcwCmEKUpoz145iHvIagfc"/>
+</div>
+<div class="flex justify-between font-mono text-[9px] text-on-surface-variant">
+<span>LAT: 35.6762</span>
+<span>LNG: 139.6503</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Section: Selected Detail (MISSION PLAYBACK) -->
+<section class="flex-1 p-6 flex flex-col gap-6">
+<div class="flex items-center gap-4">
+<h2 class="font-headline text-[12px] tracking-[0.2em] text-on-surface uppercase font-bold">MISSION PLAYBACK: INC-401</h2>
+<div class="h-[1px] flex-1 bg-stone-800"></div>
+</div>
+<div class="grid grid-cols-12 gap-6 flex-1">
+<!-- Scrubbable Video Snapshot -->
+<div class="col-span-8 bg-surface-container-lowest border border-stone-800 relative group overflow-hidden">
+<div class="absolute top-4 left-4 z-10 flex gap-2">
+<div class="px-2 py-1 bg-primary text-on-primary font-mono text-[10px]">LIVE REPLAY</div>
+<div class="px-2 py-1 bg-black/60 text-white font-mono text-[10px]">T+00:14:52</div>
+</div>
+<img class="w-full h-full object-cover opacity-70 grayscale" data-alt="Highly detailed tactical drone feed of an urban landscape with orange vector overlays and scanning UI elements" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8gRCQ-kNzVvckto8Jztel4IdZ1fAvryW4NMyme78WTBNjPQZMcN-2ZlZNtxBvlg5DKZprPa-DPrbS2tdkieqmcpdNYGiUysUUSHU5-dmXzpHIzShgcASQMc0ipNJavEM-lMmd_M1GxEpeYWwEFQAC-AjqfO0ngDHooJOw5Y5RnAefERxoerpR0TTlieyusuzN8H80ZTraNYdFc-SjmhVd_IxfcpGLD0ewpxcZ3wxSfLhsSiOoiLubEDbnlUMzqw6hw2r4JHhSrALN"/>
+<!-- Scrub Bar -->
+<div class="absolute bottom-0 left-0 w-full h-1 bg-stone-800">
+<div class="h-full bg-primary w-1/3 relative">
+<div class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rotate-45 -mr-2"></div>
+</div>
+</div>
+</div>
+<!-- Telemetry Charts -->
+<div class="col-span-4 flex flex-col gap-4">
+<div class="flex-1 bg-surface-container-lowest border border-stone-800 p-4 flex flex-col">
+<span class="font-headline text-[10px] tracking-widest text-stone-500 uppercase mb-4">Altitude / Speed (MSL)</span>
+<div class="flex-1 flex items-end gap-1 px-2">
+<div class="w-full bg-primary-container/20 h-[40%]"></div>
+<div class="w-full bg-primary-container/40 h-[60%]"></div>
+<div class="w-full bg-primary-container/20 h-[30%]"></div>
+<div class="w-full bg-primary h-[80%]"></div>
+<div class="w-full bg-primary-container/40 h-[50%]"></div>
+<div class="w-full bg-primary-container/20 h-[40%]"></div>
+<div class="w-full bg-primary-container/60 h-[70%]"></div>
+</div>
+</div>
+<div class="flex-1 bg-surface-container-lowest border border-stone-800 p-4 flex flex-col">
+<span class="font-headline text-[10px] tracking-widest text-stone-500 uppercase mb-4">Signal Integrity (dBm)</span>
+<div class="flex-1 border-b border-l border-stone-800 relative">
+<svg class="absolute inset-0 w-full h-full">
+<path d="M0 40 L40 35 L80 45 L120 20 L160 30 L200 10 L240 15" fill="none" stroke="#ffb68c" stroke-width="1"></path>
+</svg>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Right Panel: MISSION METRICS -->
+<aside class="w-72 bg-[#0e0e0f] border-l border-stone-900 p-6 flex flex-col gap-8 overflow-y-auto">
+<div class="space-y-1">
+<h2 class="font-headline text-[10px] tracking-widest text-primary uppercase font-bold">MISSION METRICS</h2>
+<div class="h-[1px] w-8 bg-primary"></div>
+</div>
+<div class="grid grid-cols-1 gap-4">
+<div class="p-4 bg-surface-container border-l-4 border-primary space-y-1">
+<div class="text-[9px] font-headline text-stone-500 tracking-widest uppercase">Response Time</div>
+<div class="text-2xl font-mono text-on-surface">04:12<span class="text-xs text-stone-500 ml-1">MIN</span></div>
+</div>
+<div class="p-4 bg-surface-container border-l-4 border-outline-variant space-y-1">
+<div class="text-[9px] font-headline text-stone-500 tracking-widest uppercase">Success Rate</div>
+<div class="text-2xl font-mono text-on-surface">98.4<span class="text-xs text-stone-500 ml-1">%</span></div>
+</div>
+<div class="p-4 bg-surface-container border-l-4 border-outline-variant space-y-1">
+<div class="text-[9px] font-headline text-stone-500 tracking-widest uppercase">Battery Consumption</div>
+<div class="text-2xl font-mono text-on-surface">62<span class="text-xs text-stone-500 ml-1">WH</span></div>
+</div>
+<div class="p-4 bg-surface-container border-l-4 border-primary-container space-y-1">
+<div class="text-[9px] font-headline text-stone-500 tracking-widest uppercase">AI Confidence</div>
+<div class="text-2xl font-mono text-primary-container">0.992</div>
+</div>
+</div>
+<div class="space-y-4 pt-4">
+<h3 class="font-headline text-[10px] tracking-widest text-stone-500 uppercase">Unit Loadout</h3>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-stone-900 border border-stone-800 text-[10px] font-mono">LIDAR-V4</span>
+<span class="px-2 py-1 bg-stone-900 border border-stone-800 text-[10px] font-mono">IR-OPTICS</span>
+<span class="px-2 py-1 bg-stone-900 border border-stone-800 text-[10px] font-mono">ECM-SHIELD</span>
+</div>
+</div>
+<div class="mt-auto flex flex-col gap-2">
+<button class="w-full border border-primary/20 text-primary py-3 font-headline text-[11px] tracking-[0.2em] uppercase hover:bg-primary/5 transition-colors">
+                    EXPORT DATA (.CSV)
+                </button>
+<button class="w-full border border-stone-800 text-stone-500 py-3 font-headline text-[11px] tracking-[0.2em] uppercase hover:text-stone-300 transition-colors">
+                    SHARE REPORT
+                </button>
+</div>
+</aside>
+</div>
+<!-- Bottom Strip: SYSTEM AUDIT LOG -->
+<footer class="h-10 bg-[#0e0e0f] border-t border-stone-900 px-6 flex items-center justify-between z-50">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 bg-primary animate-pulse"></div>
+<span class="font-headline text-[9px] tracking-widest text-stone-400 uppercase">AUDIT LOG ACTIVE</span>
+</div>
+<div class="h-3 w-[1px] bg-stone-800"></div>
+<div class="font-mono text-[9px] text-stone-600 uppercase">
+                2023-11-24 14:02:11 | ADMIN_SESSION_04 | DATA_INTEGRITY_CHECK: PASSED
+            </div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-mono text-[9px] text-stone-600">SECTOR-01 RECOVERY MODE</span>
+<span class="material-symbols-outlined text-xs text-stone-600">verified_user</span>
+</div>
+</footer>
+</body></html>
