@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, Polygon, Circle, Tool
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { Drone, Incident, DispatchLogRecord, NoFlyZone } from '../api'
+import DroneMarker from './DroneMarker'
 
 // Fix default marker icons
 try {
@@ -15,19 +16,6 @@ try {
 } catch (_) {
   // ignore icon setup errors
 }
-
-const droneIcon = (status: string) => L.divIcon({
-  className: '',
-  html: `<div style="
-    width:14px;height:14px;
-    background:${status === 'available' ? '#4caf50' : status === 'en_route' ? '#ffb68c' : status === 'on_scene' ? '#65d3fe' : '#a38c80'};
-    border:2px solid rgba(255,255,255,0.4);
-    box-shadow:0 0 12px ${status === 'en_route' ? 'rgba(255,182,140,0.8)' : 'rgba(76,175,80,0.6)'};
-    transform:rotate(45deg);
-  "></div>`,
-  iconSize: [14, 14],
-  iconAnchor: [7, 7],
-})
 
 const incidentIcon = (level: string, droneOnScene = false) => L.divIcon({
   className: '',
@@ -171,23 +159,14 @@ export default function TacticalLeafletMap({
         />
       )}
 
-      {/* Drone markers */}
+      {/* Drone markers — Lottie animated */}
       {drones.map(drone => (
-        <Marker
+        <DroneMarker
           key={drone.id}
-          position={[drone.lat, drone.lng]}
-          icon={droneIcon(drone.status)}
-          eventHandlers={{ click: () => onSelectDrone?.(drone.id) }}
-        >
-          <Popup>
-            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 11, background: '#201f20', color: '#e5e2e3', padding: 8, minWidth: 160 }}>
-              <div style={{ color: '#ffb68c', fontWeight: 700, marginBottom: 4 }}>{drone.name}</div>
-              <div>Status: <span style={{ color: drone.status === 'available' ? '#4caf50' : '#ffb68c', textTransform: 'uppercase' }}>{drone.status}</span></div>
-              <div>Battery: {Math.round(drone.battery_pct)}%</div>
-              <div>Speed: {drone.speed_kmh} km/h</div>
-            </div>
-          </Popup>
-        </Marker>
+          drone={drone}
+          selected={selectedDroneId === drone.id}
+          onSelect={id => onSelectDrone?.(id)}
+        />
       ))}
 
       {/* Dispatch route polylines from actual dispatch logs */}

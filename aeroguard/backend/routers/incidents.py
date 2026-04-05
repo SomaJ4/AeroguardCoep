@@ -20,6 +20,11 @@ async def create_incident(body: IncidentCreate, background_tasks: BackgroundTask
     data["risk_level"] = risk_level
     resp = supabase.table("incidents").insert(data).execute()
     incident = resp.data[0]
+
+    # Compute initial severity
+    from services.severity import update_incident_severity
+    update_incident_severity(incident["id"], incident)
+
     if risk_level == "high":
         background_tasks.add_task(dispatch_drone, incident["id"])
     return incident

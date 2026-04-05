@@ -1,6 +1,6 @@
 interface SidebarProps {
-  active: 'command' | 'tactical' | 'intel'
-  onNav: (page: 'command' | 'tactical' | 'intel') => void
+  active: 'command' | 'tactical' | 'intel' | 'upload'
+  onNav: (page: 'command' | 'tactical' | 'intel' | 'upload') => void
 }
 
 export default function Sidebar({ active, onNav }: SidebarProps) {
@@ -8,6 +8,7 @@ export default function Sidebar({ active, onNav }: SidebarProps) {
     { id: 'command' as const, icon: 'terminal', label: 'Command' },
     { id: 'tactical' as const, icon: 'map', label: 'Tactical' },
     { id: 'intel' as const, icon: 'emergency_home', label: 'Intel' },
+    { id: 'upload' as const, icon: 'video_library', label: 'Feeds' },
   ]
 
   return (

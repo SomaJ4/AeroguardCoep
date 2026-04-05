@@ -5,13 +5,15 @@ import TopBar from './components/TopBar'
 import CommandOverview from './pages/CommandOverview'
 import TacticalMap from './pages/TacticalMap'
 import IntelligenceHub from './pages/IntelligenceHub'
+import VideoUpload from './pages/VideoUpload'
 
-type Page = 'command' | 'tactical' | 'intel'
+type Page = 'command' | 'tactical' | 'intel' | 'upload'
 
 const PAGE_TITLES: Record<Page, { title: string; subtitle: string }> = {
   command: { title: 'OPERATIONS', subtitle: 'CITY-WIDE INCIDENT COMMAND' },
   tactical: { title: 'TACTICAL MAP', subtitle: 'DRONE DISPATCH CONTROL' },
   intel: { title: 'INTELLIGENCE HUB', subtitle: 'SIGNAL ANALYSIS & INCIDENT FEED' },
+  upload: { title: 'VIDEO ANALYSIS', subtitle: 'FEED UPLOAD & AI DETECTION' },
 }
 
 export default function App() {
@@ -27,6 +29,7 @@ export default function App() {
           {page === 'command' && <CommandOverview />}
           {page === 'tactical' && <TacticalMap />}
           {page === 'intel' && <IntelligenceHub />}
+          {page === 'upload' && <VideoUpload />}
         </main>
         {/* Status footer */}
         <footer style={{

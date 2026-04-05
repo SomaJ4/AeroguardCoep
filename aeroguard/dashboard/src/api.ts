@@ -47,6 +47,14 @@ export interface DispatchLogRecord {
   arrived_at: string | null
 }
 
+export interface Camera {
+  id: string
+  name: string
+  lat: number
+  lng: number
+  stream_url: string | null
+}
+
 export interface NoFlyZone {
   id: string
   name: string
@@ -57,6 +65,7 @@ export interface NoFlyZone {
 
 const toArray = <T>(data: unknown): T[] => (Array.isArray(data) ? data : [])
 
+export const getCameras = () => api.get<Camera[]>('/cameras').then(r => toArray<Camera>(r.data))
 export const getDrones = () => api.get<Drone[]>('/drones').then(r => toArray<Drone>(r.data))
 export const getIncidents = () => api.get<Incident[]>('/incidents').then(r => toArray<Incident>(r.data))
 export const getDispatchLogs = () => api.get<DispatchLogRecord[]>('/drones/dispatch/logs').then(r => toArray<DispatchLogRecord>(r.data))

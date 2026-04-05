@@ -92,27 +92,41 @@ def find_best_waypoints(
     """
     Find the shortest 2-waypoint detour around polygon.
 
-    For every pair of polygon vertices (W1, W2):
+    Uses bounding box corners + polygon vertices as candidates.
+    For each pair of candidates (W1, W2):
       - Check that start→W1, W1→W2, and W2→end are all collision-free.
       - Compute total detour distance.
-    Return the pair with minimum total distance, pushed slightly away from
-    the polygon centroid for safety.
-
-    Falls back to a single-vertex detour if no 2-vertex path is found,
-    and finally returns [start, end] unchanged if nothing works.
+    Return the pair with minimum total distance.
     """
     centroid = _polygon_centroid(polygon)
-    n = len(polygon)
+
+    # Build candidate waypoints: pushed polygon vertices + bounding box corners
+    lats = [p[0] for p in polygon]
+    lngs = [p[1] for p in polygon]
+    margin = 0.003  # ~300m buffer outside bounding box
+    bbox_corners = [
+        (min(lats) - margin, min(lngs) - margin),
+        (min(lats) - margin, max(lngs) + margin),
+        (max(lats) + margin, min(lngs) - margin),
+        (max(lats) + margin, max(lngs) + margin),
+        (min(lats) - margin, (min(lngs) + max(lngs)) / 2),
+        (max(lats) + margin, (min(lngs) + max(lngs)) / 2),
+        ((min(lats) + max(lats)) / 2, min(lngs) - margin),
+        ((min(lats) + max(lats)) / 2, max(lngs) + margin),
+    ]
+
+    # Also include pushed polygon vertices
+    pushed_vertices = [_push_away(p, centroid, buffer=0.002) for p in polygon]
+
+    candidates = bbox_corners + pushed_vertices
+
     best_dist = float("inf")
     best_pair: list[tuple] = []
 
-    for i in range(n):
-        w1 = _push_away(polygon[i], centroid)
-        for j in range(n):
+    for i, w1 in enumerate(candidates):
+        for j, w2 in enumerate(candidates):
             if i == j:
                 continue
-            w2 = _push_away(polygon[j], centroid)
-            # All three legs must be clear
             if (
                 not path_intersects_polygon(start, w1, polygon)
                 and not path_intersects_polygon(w1, w2, polygon)
@@ -130,11 +144,10 @@ def find_best_waypoints(
     if best_pair:
         return best_pair
 
-    # Fallback: single vertex detour
+    # Fallback: single waypoint
     best_single_dist = float("inf")
     best_single: tuple | None = None
-    for i in range(n):
-        w = _push_away(polygon[i], centroid)
+    for w in candidates:
         if (
             not path_intersects_polygon(start, w, polygon)
             and not path_intersects_polygon(w, end, polygon)
@@ -150,7 +163,6 @@ def find_best_waypoints(
     if best_single:
         return [best_single]
 
-    # Last resort: return no waypoints (straight line, caller handles it)
     return []
 
 

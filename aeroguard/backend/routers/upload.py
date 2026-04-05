@@ -160,10 +160,20 @@ async def upload_videos(
             # Save incident to Supabase and trigger dispatch if needed
             try:
                 risk_level = classify_risk(float(outcome.risk_score))
+
+                # Map Om's incident types to DB-valid values
+                TYPE_MAP = {
+                    "vehicle_collision": "accident",
+                    "unknown_anomaly":   "intrusion",
+                    "normal":            "patrol",
+                    "crowd_gathering":   "crowd_gathering",
+                }
+                db_incident_type = TYPE_MAP.get(outcome.incident_type, outcome.incident_type)
+
                 incident_data = {
                     "id": outcome.id,
                     "camera_id": outcome.camera_id,
-                    "incident_type": outcome.incident_type,
+                    "incident_type": db_incident_type,
                     "risk_score": outcome.risk_score,
                     "confidence": outcome.confidence,
                     "risk_level": risk_level,
@@ -171,8 +181,16 @@ async def upload_videos(
                     "lng": outcome.lng,
                     "snapshot_url": outcome.snapshot_url,
                     "status": "open",
+                    "human_crowd": outcome.human_crowd or 0,
+                    "crowd_score": outcome.crowd_score or 0.0,
                 }
                 supabase.table("incidents").upsert(incident_data).execute()
+
+                # Compute and store severity
+                from services.severity import update_incident_severity
+                fresh = supabase.table("incidents").select("*").eq("id", outcome.id).single().execute()
+                if fresh.data:
+                    update_incident_severity(outcome.id, fresh.data)
 
                 if risk_level == "high":
                     async def _dispatch_and_log(incident_id: str):
@@ -180,6 +198,9 @@ async def upload_videos(
                         try:
                             result = await dispatch_drone(incident_id)
                             _log.getLogger(__name__).info("Dispatch success: %s", result)
+                            # Check rerouting after new dispatch
+                            from services.rerouting import check_rerouting
+                            await check_rerouting(trigger_incident_id=incident_id)
                         except Exception as _e:
                             _log.getLogger(__name__).error("Dispatch failed for %s: %s", incident_id, _e)
                     asyncio.create_task(_dispatch_and_log(outcome.id))

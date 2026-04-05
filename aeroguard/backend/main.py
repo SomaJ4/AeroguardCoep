@@ -1,4 +1,5 @@
 import logging
+import asyncio
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -40,3 +41,25 @@ async def global_exception_handler(request, exc):
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+# ---------------------------------------------------------------------------
+# Background rerouting poll — runs every 30 seconds
+# ---------------------------------------------------------------------------
+
+async def _rerouting_poll():
+    from services.rerouting import check_rerouting
+    while True:
+        await asyncio.sleep(30)
+        try:
+            actions = await check_rerouting()
+            if actions:
+                logger.info("Rerouting poll: %d action(s) taken", len(actions))
+        except Exception:
+            logger.exception("Error in rerouting poll")
+
+
+@app.on_event("startup")
+async def startup():
+    asyncio.create_task(_rerouting_poll())
+    logger.info("Rerouting background poll started (30s interval)")

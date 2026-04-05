@@ -55,6 +55,9 @@ class IncidentOut(BaseModel):
     lng: float
     snapshot_url: str | None = None
     status: str
+    human_crowd: int = 0
+    severity: float | None = None
+    severity_trend: float | None = None
     created_at: datetime | None = None
 
 
@@ -115,12 +118,29 @@ class AnalyzeResult(BaseModel):
     """Result returned by the Vision Service POST /analyze endpoint."""
     id: str
     camera_id: str
-    incident_type: Literal["fire", "theft", "accident", "intrusion", "patrol", "animal"]
+    incident_type: Literal[
+        "fire", "theft", "accident", "intrusion", "patrol", "animal",
+        "vehicle_collision", "unknown_anomaly", "normal", "crowd_gathering"
+    ]
     risk_score: float = Field(ge=0.0, le=1.0)
     confidence: float = Field(ge=0.0, le=1.0)
     lat: float
     lng: float
     snapshot_url: Optional[str] = None
+    human_crowd: Optional[int] = 0
+    crowd_score: Optional[float] = 0.0        # Om's YOLO crowd signal (0.0–1.0)
+    # Optional enriched fields from Om's new parallel pipeline
+    decision_source: Optional[str] = None
+    autoencoder_score_raw: Optional[float] = None
+    autoencoder_score_calibrated: Optional[float] = None
+    risk_band: Optional[str] = None
+    classifier_raw_label: Optional[str] = None
+    classifier_mapped_label: Optional[str] = None
+    classifier_confidence: Optional[float] = None
+    classifier_accepted: Optional[bool] = None
+
+    class Config:
+        extra = "ignore"
 
 
 class BatchResultItem(BaseModel):

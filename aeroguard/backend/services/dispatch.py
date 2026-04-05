@@ -123,6 +123,7 @@ async def dispatch_drone(incident_id: str, drone_id: str | None = None) -> dict:
     """
     from db.supabase import supabase
     from services.simulation import simulate_drone_to_incident
+    from services.rerouting import reset_cancel_flag
 
     # Fetch active no-fly zones
     nfz_resp = supabase.table("no_fly_zones").select("*").eq("is_active", True).execute()
@@ -188,6 +189,9 @@ async def dispatch_drone(incident_id: str, drone_id: str | None = None) -> dict:
     )
     log = log_resp.data[0]
 
+    # Register a fresh cancellation flag for this drone's simulation
+    cancel_flag = reset_cancel_flag(drone["id"])
+
     # Launch waypoint-following simulation
     asyncio.create_task(
         simulate_drone_to_incident(
@@ -197,6 +201,7 @@ async def dispatch_drone(incident_id: str, drone_id: str | None = None) -> dict:
             incident_lng,
             drone.get("speed_kmh", 60.0),
             route_waypoints,
+            cancel_flag=cancel_flag,
         )
     )
 

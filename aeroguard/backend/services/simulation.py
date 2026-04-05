@@ -39,6 +39,7 @@ async def simulate_drone_to_incident(
     target_lng: float,
     speed_kmh: float = 60.0,
     waypoints: list[tuple] | None = None,
+    cancel_flag: asyncio.Event | None = None,
 ) -> None:
     """
     Background task: moves drone through each waypoint toward the incident.
@@ -74,12 +75,23 @@ async def simulate_drone_to_incident(
 
                 drone_resp = (
                     supabase.table("drones")
-                    .select("lat, lng")
+                    .select("lat, lng, status")
                     .eq("id", drone_id)
                     .single()
                     .execute()
                 )
                 drone = drone_resp.data
+
+                # Bail out if drone was manually reset to available
+                if drone["status"] == "available":
+                    logger.info("Drone %s reset to available — stopping simulation", drone_id)
+                    return
+
+                # Bail out if rerouting cancelled this simulation
+                if cancel_flag and cancel_flag.is_set():
+                    logger.info("Drone %s simulation cancelled by rerouting engine", drone_id)
+                    return
+
                 lat, lng = drone["lat"], drone["lng"]
 
                 lat, lng = move_toward(lat, lng, wp_lat, wp_lng, step_km)
@@ -126,12 +138,18 @@ async def simulate_drone_return(
 
             drone_resp = (
                 supabase.table("drones")
-                .select("lat, lng")
+                .select("lat, lng, status")
                 .eq("id", drone_id)
                 .single()
                 .execute()
             )
             drone = drone_resp.data
+
+            # Bail out if drone was manually reset
+            if drone["status"] == "available":
+                logger.info("Drone %s already available — stopping return simulation", drone_id)
+                return
+
             lat, lng = drone["lat"], drone["lng"]
 
             lat, lng = move_toward(lat, lng, home_lat, home_lng, step_km)
