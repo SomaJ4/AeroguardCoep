@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getDrones, getIncidents, dispatchDrone, getDispatchLogs, getNoFlyZones, type Drone, type Incident, type DispatchLogRecord, type NoFlyZone } from '../api'
 import TacticalLeafletMap from '../components/TacticalLeafletMap'
+import TacticalMap3D from '../components/TacticalMap3D'
 
 export default function TacticalMap() {
   const [drones, setDrones] = useState<Drone[]>([])
@@ -11,6 +12,7 @@ export default function TacticalMap() {
   const [selectedIncident, setSelectedIncident] = useState<string | null>(null)
   const [dispatching, setDispatching] = useState(false)
   const [log, setLog] = useState<string[]>(['[SYSTEM] TACTICAL MAP ONLINE', '[SYSTEM] AWAITING DISPATCH COMMAND'])
+  const [view3D, setView3D] = useState(false)
 
   const load = () => {
     getDrones().then(d => { setDrones(d); if (!selectedDrone && d.find(x => x.status === 'available')) setSelectedDrone(d.find(x => x.status === 'available')!.id) }).catch(console.error)
@@ -19,7 +21,7 @@ export default function TacticalMap() {
   }
 
   useEffect(() => {
-    getNoFlyZones().then(setNoFlyZones).catch(console.error)
+    getNoFlyZones().then(data => setNoFlyZones(Array.isArray(data) ? data : [])).catch(console.error)
     load()
     const t = setInterval(load, 5000)
     return () => clearInterval(t)
@@ -97,17 +99,34 @@ export default function TacticalMap() {
 
       {/* Center: Map */}
       <section style={{ flex: 1, position: 'relative', background: '#0e0e0f', overflow: 'hidden' }}>
-        <TacticalLeafletMap
-          drones={drones}
-          incidents={incidents}
-          dispatchLogs={dispatchLogs}
-          noFlyZones={noFlyZones}
-          selectedDroneId={selectedDrone}
-          selectedIncidentId={selectedIncident}
-          onSelectDrone={setSelectedDrone}
-          onSelectIncident={setSelectedIncident}
-          showRoutes={true}
-        />
+        {/* View toggle */}
+        <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 1000, display: 'flex', gap: 4 }}>
+          <button onClick={() => setView3D(false)} style={{
+            padding: '5px 10px', fontFamily: 'Space Grotesk', fontSize: 9, textTransform: 'uppercase',
+            letterSpacing: '0.1em', cursor: 'pointer', border: '1px solid rgba(255,182,140,0.3)',
+            background: !view3D ? '#da7635' : 'rgba(14,14,15,0.9)', color: !view3D ? '#131314' : '#ffb68c',
+          }}>2D</button>
+          <button onClick={() => setView3D(true)} style={{
+            padding: '5px 10px', fontFamily: 'Space Grotesk', fontSize: 9, textTransform: 'uppercase',
+            letterSpacing: '0.1em', cursor: 'pointer', border: '1px solid rgba(255,182,140,0.3)',
+            background: view3D ? '#da7635' : 'rgba(14,14,15,0.9)', color: view3D ? '#131314' : '#ffb68c',
+          }}>3D</button>
+        </div>
+        {view3D ? (
+          <TacticalMap3D drones={drones} incidents={incidents} dispatchLogs={dispatchLogs} noFlyZones={noFlyZones} />
+        ) : (
+          <TacticalLeafletMap
+            drones={drones}
+            incidents={incidents}
+            dispatchLogs={dispatchLogs}
+            noFlyZones={noFlyZones}
+            selectedDroneId={selectedDrone}
+            selectedIncidentId={selectedIncident}
+            onSelectDrone={setSelectedDrone}
+            onSelectIncident={setSelectedIncident}
+            showRoutes={true}
+          />
+        )}
       </section>
 
       {/* Right: AI Decision + Dispatch */}

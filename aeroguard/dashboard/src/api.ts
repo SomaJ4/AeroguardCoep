@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const api = axios.create({ baseURL: 'http://127.0.0.1:8000' })
+const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000' })
 
 export interface Drone {
   id: string
@@ -55,10 +55,12 @@ export interface NoFlyZone {
   is_active: boolean
 }
 
-export const getDrones = () => api.get<Drone[]>('/drones').then(r => r.data)
-export const getIncidents = () => api.get<Incident[]>('/incidents').then(r => r.data)
-export const getDispatchLogs = () => api.get<DispatchLogRecord[]>('/drones/dispatch/logs').then(r => r.data)
-export const getNoFlyZones = () => api.get<NoFlyZone[]>('/drones/no-fly-zones').then(r => r.data)
+const toArray = <T>(data: unknown): T[] => (Array.isArray(data) ? data : [])
+
+export const getDrones = () => api.get<Drone[]>('/drones').then(r => toArray<Drone>(r.data))
+export const getIncidents = () => api.get<Incident[]>('/incidents').then(r => toArray<Incident>(r.data))
+export const getDispatchLogs = () => api.get<DispatchLogRecord[]>('/drones/dispatch/logs').then(r => toArray<DispatchLogRecord>(r.data))
+export const getNoFlyZones = () => api.get<NoFlyZone[]>('/drones/no-fly-zones').then(r => toArray<NoFlyZone>(r.data))
 export const dispatchDrone = (incident_id: string, drone_id?: string) =>
   api.post<DispatchLog>('/drones/dispatch', { incident_id, drone_id }).then(r => r.data)
 export const updateIncidentStatus = (id: string, status: string) =>
