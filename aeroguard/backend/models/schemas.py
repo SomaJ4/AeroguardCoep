@@ -47,7 +47,7 @@ class IncidentCreate(BaseModel):
 class IncidentOut(BaseModel):
     id: str
     camera_id: str
-    incident_type: str
+    incident_type: str  # unrestricted — DB may have legacy values
     risk_score: float
     confidence: float
     risk_level: str
@@ -56,9 +56,13 @@ class IncidentOut(BaseModel):
     snapshot_url: str | None = None
     status: str
     human_crowd: int = 0
+    crowd_score: float = 0.0
     severity: float | None = None
     severity_trend: float | None = None
     created_at: datetime | None = None
+
+    class Config:
+        extra = "ignore"
 
 
 # Drone
@@ -70,10 +74,13 @@ class DroneOut(BaseModel):
     home_lat: float
     home_lng: float
     battery_pct: float
-    status: Literal["available", "en_route", "on_scene", "charging"]
+    status: str  # unrestricted output
     speed_kmh: float
     stream_url: str | None = None
     created_at: datetime | None = None
+
+    class Config:
+        extra = "ignore"
 
 
 # Dispatch
