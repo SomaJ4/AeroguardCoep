@@ -193,17 +193,34 @@ async def upload_videos(
                     update_incident_severity(outcome.id, fresh.data)
 
                 if risk_level == "high":
-                    async def _dispatch_and_log(incident_id: str):
+                    async def _dispatch_and_log(incident_id: str, itype: str, ilat: float, ilng: float):
                         import logging as _log
                         try:
                             result = await dispatch_drone(incident_id)
                             _log.getLogger(__name__).info("Dispatch success: %s", result)
-                            # Check rerouting after new dispatch
                             from services.rerouting import check_rerouting
                             await check_rerouting(trigger_incident_id=incident_id)
                         except Exception as _e:
                             _log.getLogger(__name__).error("Dispatch failed for %s: %s", incident_id, _e)
-                    asyncio.create_task(_dispatch_and_log(outcome.id))
+                        try:
+                            from services.emergency_response import handle_emergency_response
+                            await handle_emergency_response(
+                                incident_id=incident_id,
+                                incident_type=itype,
+                                risk_level="high",
+                                lat=ilat,
+                                lng=ilng,
+                            )
+                        except Exception as _e:
+                            _log.getLogger(__name__).error("Emergency response failed for %s: %s", incident_id, _e)
+
+                    # Capture current values explicitly to avoid closure bug
+                    asyncio.create_task(_dispatch_and_log(
+                        str(outcome.id),
+                        str(outcome.incident_type),
+                        float(outcome.lat),
+                        float(outcome.lng),
+                    ))
                 elif risk_level == "medium":
                     supabase.table("alerts").insert({
                         "incident_id": outcome.id,

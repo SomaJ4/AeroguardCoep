@@ -43,8 +43,30 @@ async def incident_inserted(request: Request):
     logger.info("Webhook: incident %s classified as %s", incident_id, risk_level)
 
     if risk_level == "high":
-        asyncio.create_task(dispatch_drone(incident_id))
-        logger.info("Webhook: auto-dispatch triggered for incident %s", incident_id)
+        async def _dispatch_and_notify(inc_id: str, inc_type: str, lat: float, lng: float):
+            try:
+                await dispatch_drone(inc_id)
+                logger.info("Webhook: auto-dispatch triggered for incident %s", inc_id)
+            except Exception as e:
+                logger.error("Webhook: dispatch failed for %s: %s", inc_id, e)
+            try:
+                from services.emergency_response import handle_emergency_response
+                await handle_emergency_response(
+                    incident_id=inc_id,
+                    incident_type=inc_type,
+                    risk_level="high",
+                    lat=lat,
+                    lng=lng,
+                )
+            except Exception as e:
+                logger.error("Webhook: emergency response failed for %s: %s", inc_id, e)
+
+        asyncio.create_task(_dispatch_and_notify(
+            incident_id,
+            record.get("incident_type", "unknown"),
+            float(record.get("lat", 0)),
+            float(record.get("lng", 0)),
+        ))
     elif risk_level == "medium":
         # Push alert so dashboard can show manual dispatch prompt
         supabase.table("alerts").insert({

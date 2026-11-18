@@ -5,9 +5,9 @@ def classify_risk(risk_score: float) -> str:
     0.05 – 0.08   → 'medium' (manual dispatch alert)
     > 0.08        → 'high'   (auto-dispatch drone)
     """
-    if risk_score < 0.05:
+    if risk_score < 0.03:
         return "low"
-    elif risk_score <= 0.08:
+    elif risk_score <= 0.06:
         return "medium"
     else:
         return "high"

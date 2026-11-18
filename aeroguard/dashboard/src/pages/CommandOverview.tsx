@@ -132,7 +132,7 @@ export default function CommandOverview() {
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: inc.risk_level === 'high' ? '#ff4444' : '#ffb68c', fontWeight: 700 }}>
-                    {inc.risk_level.toUpperCase()}
+                    {(inc.risk_level ?? 'unknown').toUpperCase()}
                   </div>
                   <div style={{ fontFamily: 'JetBrains Mono', fontSize: 9, color: '#a38c80' }}>{inc.risk_score.toFixed(3)}</div>
                 </div>

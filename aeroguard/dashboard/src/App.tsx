@@ -6,6 +6,7 @@ import CommandOverview from './pages/CommandOverview'
 import TacticalMap from './pages/TacticalMap'
 import IntelligenceHub from './pages/IntelligenceHub'
 import VideoUpload from './pages/VideoUpload'
+import Login from './pages/Login'
 
 type Page = 'command' | 'tactical' | 'intel' | 'upload'
 
@@ -17,11 +18,25 @@ const PAGE_TITLES: Record<Page, { title: string; subtitle: string }> = {
 }
 
 export default function App() {
+  const [loggedIn, setLoggedIn] = useState(false)
   const [page, setPage] = useState<Page>('command')
   const { title, subtitle } = PAGE_TITLES[page]
 
+  if (!loggedIn) {
+    return <Login onLogin={() => setLoggedIn(true)} />
+  }
+
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#131314' }}>
+    <div style={{
+      display: 'flex', height: '100vh', overflow: 'hidden', background: '#131314',
+      animation: 'slideInFromBottom 0.5s cubic-bezier(0.76, 0, 0.24, 1) both',
+    }}>
+      <style>{`
+        @keyframes slideInFromBottom {
+          from { opacity: 0; transform: translateY(40px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
       <Sidebar active={page} onNav={setPage} />
       <div style={{ flex: 1, marginLeft: 80, display: 'flex', flexDirection: 'column' }}>
         <TopBar title={title} subtitle={subtitle} />
@@ -31,7 +46,6 @@ export default function App() {
           {page === 'intel' && <IntelligenceHub />}
           {page === 'upload' && <VideoUpload />}
         </main>
-        {/* Status footer */}
         <footer style={{
           height: 32, background: '#0e0e0f', borderTop: '1px solid rgba(218,118,53,0.2)',
           display: 'flex', alignItems: 'center', padding: '0 16px', gap: 16, overflow: 'hidden'

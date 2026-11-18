@@ -36,6 +36,10 @@ function getOrCreateIcon(droneId: string): L.DivIcon {
 export default function DroneMarker({ drone, selected, onSelect }: Props) {
   const animRef = useRef<ReturnType<typeof lottie.loadAnimation> | null>(null)
   const mountedRef = useRef(false)
+  const markerRef = useRef<L.Marker | null>(null)
+  const posRef = useRef<{ lat: number; lng: number }>({ lat: drone.lat, lng: drone.lng })
+  const targetRef = useRef<{ lat: number; lng: number }>({ lat: drone.lat, lng: drone.lng })
+  const rafRef = useRef<number | null>(null)
   const color = STATUS_COLORS[drone.status] || '#ffb68c'
   const icon = getOrCreateIcon(drone.id)
   const containerId = `drone-lottie-${drone.id}`
@@ -60,6 +64,37 @@ export default function DroneMarker({ drone, selected, onSelect }: Props) {
     return () => clearTimeout(timer)
   }, [containerId])
 
+  // Smooth interpolation toward new target position
+  useEffect(() => {
+    targetRef.current = { lat: drone.lat, lng: drone.lng }
+
+    const LERP = 0.06 // smoothing factor — lower = smoother/slower
+
+    const animate = () => {
+      const cur = posRef.current
+      const tgt = targetRef.current
+      const dLat = tgt.lat - cur.lat
+      const dLng = tgt.lng - cur.lng
+
+      if (Math.abs(dLat) > 0.000001 || Math.abs(dLng) > 0.000001) {
+        posRef.current = {
+          lat: cur.lat + dLat * LERP,
+          lng: cur.lng + dLng * LERP,
+        }
+        markerRef.current?.setLatLng([posRef.current.lat, posRef.current.lng])
+        rafRef.current = requestAnimationFrame(animate)
+      } else {
+        posRef.current = { ...tgt }
+        markerRef.current?.setLatLng([tgt.lat, tgt.lng])
+      }
+    }
+
+    if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    rafRef.current = requestAnimationFrame(animate)
+
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
+  }, [drone.lat, drone.lng])
+
   // Update glow color when status changes — don't remount animation
   useEffect(() => {
     const el = document.getElementById(containerId)
@@ -72,6 +107,7 @@ export default function DroneMarker({ drone, selected, onSelect }: Props) {
 
   return (
     <Marker
+      ref={markerRef}
       position={[drone.lat, drone.lng]}
       icon={icon}
       eventHandlers={{ click: () => onSelect(drone.id) }}
@@ -102,3 +138,4 @@ export default function DroneMarker({ drone, selected, onSelect }: Props) {
     </Marker>
   )
 }
+

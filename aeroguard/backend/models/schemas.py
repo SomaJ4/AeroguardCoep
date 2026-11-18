@@ -50,7 +50,7 @@ class IncidentOut(BaseModel):
     incident_type: str  # unrestricted — DB may have legacy values
     risk_score: float
     confidence: float
-    risk_level: str
+    risk_level: str | None = None
     lat: float
     lng: float
     snapshot_url: str | None = None

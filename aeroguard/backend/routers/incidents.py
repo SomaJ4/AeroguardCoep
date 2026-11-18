@@ -27,7 +27,18 @@ async def create_incident(body: IncidentCreate, background_tasks: BackgroundTask
 
     if risk_level == "high":
         background_tasks.add_task(dispatch_drone, incident["id"])
+        background_tasks.add_task(
+            _emergency_response_bg,
+            incident["id"], body.incident_type, risk_level, body.lat, body.lng
+        )
     return incident
+
+
+async def _emergency_response_bg(
+    incident_id: str, incident_type: str, risk_level: str, lat: float, lng: float
+):
+    from services.emergency_response import handle_emergency_response
+    await handle_emergency_response(incident_id, incident_type, risk_level, lat, lng)
 
 
 @router.patch("/{incident_id}/status", response_model=IncidentOut)

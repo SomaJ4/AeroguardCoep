@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getDrones, getIncidents, dispatchDrone, getDispatchLogs, getNoFlyZones, type Drone, type Incident, type DispatchLogRecord, type NoFlyZone } from '../api'
 import TacticalLeafletMap from '../components/TacticalLeafletMap'
-import TacticalMap3D from '../components/TacticalMap3D'
 
 export default function TacticalMap() {
   const [drones, setDrones] = useState<Drone[]>([])
@@ -12,19 +11,40 @@ export default function TacticalMap() {
   const [selectedIncident, setSelectedIncident] = useState<string | null>(null)
   const [dispatching, setDispatching] = useState(false)
   const [log, setLog] = useState<string[]>(['[SYSTEM] TACTICAL MAP ONLINE', '[SYSTEM] AWAITING DISPATCH COMMAND'])
-  const [view3D, setView3D] = useState(false)
+
+  const failCount = useRef(0)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const scheduleNext = (delay: number) => {
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(load, delay)
+  }
 
   const load = () => {
-    getDrones().then(d => { setDrones(d); if (!selectedDrone && d.find(x => x.status === 'available')) setSelectedDrone(d.find(x => x.status === 'available')!.id) }).catch(console.error)
-    getIncidents().then(i => { setIncidents(i); if (!selectedIncident && i.find(x => x.status !== 'resolved')) setSelectedIncident(i.find(x => x.status !== 'resolved')!.id) }).catch(console.error)
-    getDispatchLogs().then(setDispatchLogs).catch(console.error)
+    Promise.all([
+      getDrones(),
+      getIncidents(),
+      getDispatchLogs(),
+    ]).then(([d, i, logs]) => {
+      failCount.current = 0
+      setDrones(d)
+      if (!selectedDrone && d.find(x => x.status === 'available')) setSelectedDrone(d.find(x => x.status === 'available')!.id)
+      setIncidents(i)
+      if (!selectedIncident && i.find(x => x.status !== 'resolved')) setSelectedIncident(i.find(x => x.status !== 'resolved')!.id)
+      setDispatchLogs(logs)
+      scheduleNext(5000)
+    }).catch(() => {
+      failCount.current += 1
+      // Back off: 5s → 10s → 20s → 40s → cap at 60s
+      const delay = Math.min(5000 * Math.pow(2, failCount.current - 1), 60000)
+      scheduleNext(delay)
+    })
   }
 
   useEffect(() => {
-    getNoFlyZones().then(data => setNoFlyZones(Array.isArray(data) ? data : [])).catch(console.error)
+    getNoFlyZones().then(setNoFlyZones).catch(() => {})
     load()
-    const t = setInterval(load, 5000)
-    return () => clearInterval(t)
+    return () => { if (timerRef.current) clearTimeout(timerRef.current) }
   }, [])
 
   const handleDispatch = async () => {
@@ -99,34 +119,17 @@ export default function TacticalMap() {
 
       {/* Center: Map */}
       <section style={{ flex: 1, position: 'relative', background: '#0e0e0f', overflow: 'hidden' }}>
-        {/* View toggle */}
-        <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 1000, display: 'flex', gap: 4 }}>
-          <button onClick={() => setView3D(false)} style={{
-            padding: '5px 10px', fontFamily: 'Space Grotesk', fontSize: 9, textTransform: 'uppercase',
-            letterSpacing: '0.1em', cursor: 'pointer', border: '1px solid rgba(255,182,140,0.3)',
-            background: !view3D ? '#da7635' : 'rgba(14,14,15,0.9)', color: !view3D ? '#131314' : '#ffb68c',
-          }}>2D</button>
-          <button onClick={() => setView3D(true)} style={{
-            padding: '5px 10px', fontFamily: 'Space Grotesk', fontSize: 9, textTransform: 'uppercase',
-            letterSpacing: '0.1em', cursor: 'pointer', border: '1px solid rgba(255,182,140,0.3)',
-            background: view3D ? '#da7635' : 'rgba(14,14,15,0.9)', color: view3D ? '#131314' : '#ffb68c',
-          }}>3D</button>
-        </div>
-        {view3D ? (
-          <TacticalMap3D drones={drones} incidents={incidents} dispatchLogs={dispatchLogs} noFlyZones={noFlyZones} />
-        ) : (
-          <TacticalLeafletMap
-            drones={drones}
-            incidents={incidents}
-            dispatchLogs={dispatchLogs}
-            noFlyZones={noFlyZones}
-            selectedDroneId={selectedDrone}
-            selectedIncidentId={selectedIncident}
-            onSelectDrone={setSelectedDrone}
-            onSelectIncident={setSelectedIncident}
-            showRoutes={true}
-          />
-        )}
+        <TacticalLeafletMap
+          drones={drones}
+          incidents={incidents}
+          dispatchLogs={dispatchLogs}
+          noFlyZones={noFlyZones}
+          selectedDroneId={selectedDrone}
+          selectedIncidentId={selectedIncident}
+          onSelectDrone={setSelectedDrone}
+          onSelectIncident={setSelectedIncident}
+          showRoutes={true}
+        />
       </section>
 
       {/* Right: AI Decision + Dispatch */}
@@ -142,7 +145,7 @@ export default function TacticalMap() {
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: '#ffb68c', textTransform: 'uppercase' }}>{inc.incident_type}</span>
-                  <span style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: inc.risk_level === 'high' ? '#ff4444' : '#ffb68c', fontWeight: 700 }}>{inc.risk_level.toUpperCase()}</span>
+                  <span style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: inc.risk_level === 'high' ? '#ff4444' : '#ffb68c', fontWeight: 700 }}>{(inc.risk_level ?? 'unknown').toUpperCase()}</span>
                 </div>
                 <div style={{ fontFamily: 'JetBrains Mono', fontSize: 9, color: '#a38c80', marginTop: 4 }}>Score: {inc.risk_score.toFixed(4)}</div>
               </div>

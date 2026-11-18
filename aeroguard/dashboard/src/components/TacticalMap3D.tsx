@@ -139,7 +139,7 @@ export default function TacticalMap3D({ drones, incidents, dispatchLogs = [], no
       const el = document.createElement('div')
       el.style.cssText = `width:${droneOnScene ? 20 : 14}px;height:${droneOnScene ? 20 : 14}px;background:${color};border-radius:50%;border:2px solid rgba(255,255,255,0.5);box-shadow:0 0 16px ${color};cursor:pointer;`
       const popup = new maplibregl.Popup({ offset: 12, closeButton: false })
-        .setHTML(`<div style="font-family:monospace;font-size:11px;background:#201f20;color:#e5e2e3;padding:8px;min-width:140px"><b style="color:${color}">${droneOnScene ? '✓ DRONE ON SCENE' : inc.incident_type.toUpperCase()}</b><br>Risk: ${inc.risk_level.toUpperCase()}<br>Score: ${inc.risk_score.toFixed(4)}</div>`)
+        .setHTML(`<div style="font-family:monospace;font-size:11px;background:#201f20;color:#e5e2e3;padding:8px;min-width:140px"><b style="color:${color}">${droneOnScene ? '✓ DRONE ON SCENE' : inc.incident_type.toUpperCase()}</b><br>Risk: ${(inc.risk_level ?? 'unknown').toUpperCase()}<br>Score: ${inc.risk_score.toFixed(4)}</div>`)
       markersRef.current.push(new maplibregl.Marker({ element: el }).setLngLat([inc.lng, inc.lat]).setPopup(popup).addTo(map))
     })
   }, [drones, incidents, dispatchLogs])

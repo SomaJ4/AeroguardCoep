@@ -21,7 +21,7 @@ export interface Incident {
   incident_type: string
   risk_score: number
   confidence: number
-  risk_level: string
+  risk_level: string | null
   lat: number
   lng: number
   snapshot_url: string | null

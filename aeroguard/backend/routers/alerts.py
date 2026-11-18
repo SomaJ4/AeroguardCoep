@@ -47,3 +47,51 @@ def acknowledge_alert(alert_id: str):
         .execute()
     )
     return resp.data[0]
+
+
+class EmergencyTestRequest(BaseModel):
+    incident_type: str = "vehicle_collision"
+    lat: float = 18.5074
+    lng: float = 73.9286
+
+
+@router.post("/test-emergency")
+async def test_emergency_response(body: EmergencyTestRequest):
+    """
+    Test endpoint — triggers emergency contact lookup + SMS for a fake high-risk incident.
+    """
+    import uuid
+    import os
+    from services.emergency_response import handle_emergency_response
+    from services.emergency_contacts import get_emergency_contacts
+
+    fake_id = str(uuid.uuid4())
+
+    # Debug: check credentials are loaded
+    creds = {
+        "TWILIO_ACCOUNT_SID": bool(os.environ.get("TWILIO_ACCOUNT_SID")),
+        "TWILIO_AUTH_TOKEN":  bool(os.environ.get("TWILIO_AUTH_TOKEN")),
+        "TWILIO_FROM_NUMBER": os.environ.get("TWILIO_FROM_NUMBER", "NOT SET"),
+        "EMERGENCY_TO_NUMBER": os.environ.get("EMERGENCY_TO_NUMBER", "NOT SET"),
+    }
+
+    # Debug: fetch contacts separately so we can return them
+    contacts = await get_emergency_contacts(body.incident_type, body.lat, body.lng)
+
+    # Test Twilio directly
+    from services.twilio_notify import send_emergency_sms
+    sms_result = await send_emergency_sms(
+        incident_type=body.incident_type,
+        risk_level="high",
+        lat=body.lat,
+        lng=body.lng,
+        contacts=contacts,
+        incident_id=fake_id,
+    )
+
+    return {
+        "incident_id": fake_id,
+        "credentials_present": creds,
+        "contacts_found": contacts,
+        "sms_sent": sms_result,
+    }

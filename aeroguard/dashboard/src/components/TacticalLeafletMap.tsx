@@ -1,41 +1,71 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, Polyline, Polygon, Circle, Tooltip, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import type { Drone, Incident, DispatchLogRecord, NoFlyZone } from '../api'
-import DroneMarker from './DroneMarker'
 
 // Fix default marker icons
-try {
-  delete (L.Icon.Default.prototype as any)._getIconUrl
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+delete (L.Icon.Default.prototype as any)._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+})
+
+const makeDroneIcon = (status: string) => {
+  const opacity = status === 'charging' ? 0.4 : 1
+  const size = status === 'en_route' ? 36 : 30
+  return L.divIcon({
+    className: '',
+    html: `<img src="/drone.png" style="width:${size}px;height:${size}px;opacity:${opacity};filter:drop-shadow(0 0 6px ${
+      status === 'available' ? 'rgba(76,175,80,0.9)' :
+      status === 'en_route'  ? 'rgba(255,182,140,0.9)' :
+      status === 'on_scene'  ? 'rgba(101,211,254,0.9)' :
+      'rgba(163,140,128,0.5)'
+    });" />`,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
   })
-} catch (_) {
-  // ignore icon setup errors
 }
 
-const incidentIcon = (level: string, droneOnScene = false) => L.divIcon({
+function DroneMarker({ drone, onSelect }: { drone: Drone; onSelect?: (id: string) => void }) {
+  const markerRef = useRef<L.Marker | null>(null)
+
+  useEffect(() => {
+    markerRef.current?.setLatLng([drone.lat, drone.lng])
+  }, [drone.lat, drone.lng])
+
+  return (
+    <Marker
+      ref={markerRef}
+      position={[drone.lat, drone.lng]}
+      icon={makeDroneIcon(drone.status)}
+      eventHandlers={{ click: () => onSelect?.(drone.id) }}
+    >
+      <Popup>
+        <div style={{ fontFamily: 'JetBrains Mono', fontSize: 11, background: '#201f20', color: '#e5e2e3', padding: 8, minWidth: 160 }}>
+          <div style={{ color: '#ffb68c', fontWeight: 700, marginBottom: 4 }}>{drone.name}</div>
+          <div>Status: <span style={{ color: drone.status === 'available' ? '#4caf50' : '#ffb68c', textTransform: 'uppercase' }}>{drone.status}</span></div>
+          <div>Battery: {Math.round(drone.battery_pct)}%</div>
+          <div>Speed: {drone.speed_kmh} km/h</div>
+        </div>
+      </Popup>
+    </Marker>
+  )
+}
+
+const incidentIcon = (level: string) => L.divIcon({
   className: '',
-  html: droneOnScene
-    ? `<div style="position:relative;width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
-        <div style="position:absolute;width:32px;height:32px;border-radius:50%;border:2px solid #65d3fe;opacity:0.8;animation:ripple1 1.5s ease-out infinite;"></div>
-        <div style="position:absolute;width:24px;height:24px;border-radius:50%;border:2px solid #65d3fe;opacity:0.6;animation:ripple1 1.5s ease-out 0.4s infinite;"></div>
-        <div style="position:absolute;width:16px;height:16px;border-radius:50%;border:2px solid #65d3fe;opacity:0.4;animation:ripple1 1.5s ease-out 0.8s infinite;"></div>
-        <div style="width:10px;height:10px;background:#65d3fe;border-radius:50%;box-shadow:0 0 12px rgba(101,211,254,0.9);position:relative;z-index:10;"></div>
-       </div>`
-    : `<div style="
-        width:16px;height:16px;
-        background:${level === 'high' ? '#ff4444' : level === 'medium' ? '#ffb68c' : '#4caf50'};
-        border-radius:50%;
-        border:2px solid rgba(255,255,255,0.5);
-        box-shadow:0 0 16px ${level === 'high' ? 'rgba(255,68,68,0.8)' : 'rgba(255,182,140,0.6)'};
-        animation:pulse 2s infinite;
-      "></div>`,
-  iconSize: droneOnScene ? [32, 32] : [16, 16],
-  iconAnchor: droneOnScene ? [16, 16] : [8, 8],
+  html: `<div style="
+    width:16px;height:16px;
+    background:${level === 'high' ? '#ff4444' : level === 'medium' ? '#ffb68c' : '#4caf50'};
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,0.5);
+    box-shadow:0 0 16px ${level === 'high' ? 'rgba(255,68,68,0.8)' : 'rgba(255,182,140,0.6)'};
+    animation:pulse 2s infinite;
+  "></div>`,
+  iconSize: [16, 16],
+  iconAnchor: [8, 8],
 })
 
 function MapStyler() {
@@ -44,10 +74,7 @@ function MapStyler() {
     const container = map.getContainer()
     container.style.background = '#0e0e0f'
     const style = document.createElement('style')
-    style.textContent = `
-      .leaflet-tile { filter: invert(1) hue-rotate(180deg) brightness(0.7) saturate(0.5) !important; }
-      @keyframes ripple1 { 0% { transform: scale(0.5); opacity: 0.8; } 100% { transform: scale(2); opacity: 0; } }
-    `
+    style.textContent = `.leaflet-tile { filter: invert(1) hue-rotate(180deg) brightness(0.7) saturate(0.5) !important; }`
     document.head.appendChild(style)
     return () => { document.head.removeChild(style) }
   }, [map])
@@ -73,7 +100,6 @@ export default function TacticalLeafletMap({
   // Center on Pune (where the cameras are)
   const center: [number, number] = [18.5018, 73.9357]
 
-  const selDrone = drones.find(d => d.id === selectedDroneId)
   const selInc = incidents.find(i => i.id === selectedIncidentId)
 
   return (
@@ -90,7 +116,7 @@ export default function TacticalLeafletMap({
       />
 
       {/* No-fly zone polygons */}
-      {(Array.isArray(noFlyZones) ? noFlyZones : []).map(zone => {
+      {noFlyZones.map(zone => {
         const positions: [number, number][] = zone.polygon.map(p => [p.lat, p.lng])
         const color = zone.reason === 'hospital' ? '#ff6b6b'
           : zone.reason === 'military' ? '#ff4444'
@@ -123,32 +149,24 @@ export default function TacticalLeafletMap({
       })}
 
       {/* Incident markers */}
-      {incidents.filter(i => i.status !== 'resolved').map(inc => {
-        const droneOnScene = dispatchLogs.some(log => {
-          const drone = drones.find(d => d.id === log.drone_id)
-          return log.incident_id === inc.id && drone?.status === 'on_scene'
-        })
-        return (
-          <Marker
-            key={inc.id}
-            position={[inc.lat, inc.lng]}
-            icon={incidentIcon(inc.risk_level, droneOnScene)}
-            eventHandlers={{ click: () => onSelectIncident?.(inc.id) }}
-          >
-            <Popup className="tactical-popup">
-              <div style={{ fontFamily: 'JetBrains Mono', fontSize: 11, background: '#201f20', color: '#e5e2e3', padding: 8, minWidth: 160 }}>
-                <div style={{ color: droneOnScene ? '#65d3fe' : '#ffb68c', fontWeight: 700, marginBottom: 4, textTransform: 'uppercase' }}>
-                  {droneOnScene ? '✓ DRONE ON SCENE' : inc.incident_type}
-                </div>
-                <div>Risk: <span style={{ color: inc.risk_level === 'high' ? '#ff4444' : '#ffb68c' }}>{inc.risk_level.toUpperCase()}</span></div>
-                <div>Score: {inc.risk_score.toFixed(4)}</div>
-                <div>Confidence: {Math.round(inc.confidence * 100)}%</div>
-                <div style={{ color: '#a38c80', marginTop: 4, fontSize: 9 }}>{inc.lat.toFixed(4)}°N {inc.lng.toFixed(4)}°E</div>
-              </div>
-            </Popup>
-          </Marker>
-        )
-      })}
+      {incidents.filter(i => i.status !== 'resolved').map(inc => (
+        <Marker
+          key={inc.id}
+          position={[inc.lat, inc.lng]}
+          icon={incidentIcon(inc.risk_level)}
+          eventHandlers={{ click: () => onSelectIncident?.(inc.id) }}
+        >
+          <Popup className="tactical-popup">
+            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 11, background: '#201f20', color: '#e5e2e3', padding: 8, minWidth: 160 }}>
+              <div style={{ color: '#ffb68c', fontWeight: 700, marginBottom: 4, textTransform: 'uppercase' }}>{inc.incident_type}</div>
+              <div>Risk: <span style={{ color: inc.risk_level === 'high' ? '#ff4444' : '#ffb68c' }}>{(inc.risk_level ?? 'unknown').toUpperCase()}</span></div>
+              <div>Score: {inc.risk_score.toFixed(4)}</div>
+              <div>Confidence: {Math.round(inc.confidence * 100)}%</div>
+              <div style={{ color: '#a38c80', marginTop: 4, fontSize: 9 }}>{inc.lat.toFixed(4)}°N {inc.lng.toFixed(4)}°E</div>
+            </div>
+          </Popup>
+        </Marker>
+      ))}
 
       {/* Pulse ring on selected incident */}
       {selInc && (
@@ -159,99 +177,40 @@ export default function TacticalLeafletMap({
         />
       )}
 
-      {/* Drone markers — Lottie animated */}
+      {/* Drone markers with PNG icon */}
       {drones.map(drone => (
-        <DroneMarker
-          key={drone.id}
-          drone={drone}
-          selected={selectedDroneId === drone.id}
-          onSelect={id => onSelectDrone?.(id)}
-        />
+        <DroneMarker key={drone.id} drone={drone} onSelect={onSelectDrone} />
       ))}
 
-      {/* Dispatch route polylines from actual dispatch logs */}
+      {/* Dispatch route polylines — only shown for EN_ROUTE drones */}
       {showRoutes && dispatchLogs.map(log => {
-        if (!log.route_geojson?.coordinates?.length) return null
-        const positions: [number, number][] = log.route_geojson.coordinates.map(
-          ([lng, lat]) => [lat, lng]
-        )
         const drone = drones.find(d => d.id === log.drone_id)
-        const isEnRoute = drone?.status === 'en_route'
-        const isOnScene = drone?.status === 'on_scene'
 
-        if (isEnRoute) {
-          // Show dashed orange outbound route
-          return (
-            <Polyline
-              key={log.id}
-              positions={positions}
-              pathOptions={{ color: '#ffb68c', weight: 2, dashArray: '6 4', opacity: 0.9 }}
-            />
-          )
+        // Only show trace when drone is en_route
+        if (!drone || drone.status !== 'en_route') return null
+
+        let positions: [number, number][] | null = null
+
+        if (log.route_geojson?.coordinates?.length) {
+          // GeoJSON coords are [lng, lat] — Leaflet needs [lat, lng]
+          positions = log.route_geojson.coordinates.map(([lng, lat]) => [lat, lng])
         }
 
-        if (isOnScene) {
-          // Show return route in teal (reversed path)
-          const returnPositions = [...positions].reverse()
-          return (
-            <Polyline
-              key={log.id}
-              positions={returnPositions}
-              pathOptions={{ color: '#65d3fe', weight: 2, dashArray: '6 4', opacity: 0.7 }}
-            />
-          )
-        }
+        // No fallback straight line — only show actual computed routes
+        // that respect no-fly zones
+        if (!positions || positions.length < 2) return null
 
-        // Completed/inactive — faded
         return (
           <Polyline
             key={log.id}
             positions={positions}
-            pathOptions={{ color: 'rgba(255,182,140,0.2)', weight: 1, dashArray: '2 6', opacity: 0.3 }}
+            pathOptions={{
+              color: '#ffb68c',
+              weight: 2.5,
+              dashArray: '8 5',
+              opacity: 1,
+            }}
           />
-        )
-      })}
-
-      {/* Fallback: dashed line from selected drone to selected incident when no log route */}
-      {showRoutes && selDrone && selInc && dispatchLogs.length === 0 && (
-        <Polyline
-          positions={[[selDrone.lat, selDrone.lng], [selInc.lat, selInc.lng]]}
-          pathOptions={{ color: '#ffb68c', weight: 2, dashArray: '6 4', opacity: 0.7 }}
-        />
-      )}
-
-      {/* Drone launch point markers — shows where each drone started from */}
-      {showRoutes && dispatchLogs.map(log => {
-        if (!log.route_geojson?.coordinates?.length) return null
-        const [startLng, startLat] = log.route_geojson.coordinates[0]
-        const drone = drones.find(d => d.id === log.drone_id)
-        const isActive = drone && (drone.status === 'en_route' || drone.status === 'on_scene')
-        if (!isActive) return null
-        const launchIcon = L.divIcon({
-          className: '',
-          html: `<div style="
-            width:10px;height:10px;
-            background:transparent;
-            border:2px solid #ffb68c;
-            border-radius:50%;
-            box-shadow:0 0 8px rgba(255,182,140,0.6);
-          "></div>`,
-          iconSize: [10, 10],
-          iconAnchor: [5, 5],
-        })
-        return (
-          <Marker
-            key={`launch-${log.id}`}
-            position={[startLat, startLng]}
-            icon={launchIcon}
-          >
-            <Popup>
-              <div style={{ fontFamily: 'JetBrains Mono', fontSize: 11, background: '#201f20', color: '#e5e2e3', padding: 8 }}>
-                <div style={{ color: '#ffb68c', fontWeight: 700 }}>{drone?.name ?? 'Drone'}</div>
-                <div style={{ color: '#a38c80', fontSize: 9 }}>LAUNCH POINT</div>
-              </div>
-            </Popup>
-          </Marker>
         )
       })}
     </MapContainer>
